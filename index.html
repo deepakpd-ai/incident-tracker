@@ -211,7 +211,7 @@
     .upload-label span { color: var(--brand); font-weight: 600; }
     .preview-img {
       width: 100%; border-radius: var(--radius-sm); display: none;
-      margin-top: 12px; max-height: 200px; object-fit: cover;
+      margin-top: 12px; max-height: 320px; object-fit: contain;
     }
     .remove-photo {
       margin-top: 8px; background: none; border: none;
@@ -372,7 +372,7 @@
     <div class="form-card">
       <div class="section-label">Location</div>
       <div class="geo-row">
-        <input type="text" id="f-geo" placeholder="Tap 'Locate me' or enter manually" readonly />
+        <input type="text" id="f-geo" placeholder="Tap 'Locate me' or type address" />
         <button class="geo-btn" onclick="getLocation()" id="geo-btn">
           📍 Locate me
         </button>
