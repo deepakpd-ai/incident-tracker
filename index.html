@@ -628,11 +628,20 @@
     showLoader('Submitting your report…');
     document.getElementById('submit-btn').disabled = true;
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const params = new URLSearchParams({
+        action: payload.action,
+        refId: payload.refId,
+        phone: payload.phone,
+        name: payload.name,
+        description: payload.description,
+        category: payload.category,
+        geo: payload.geo,
+        lat: String(payload.lat),
+        lng: String(payload.lng),
+        logDate: payload.logDate,
+        photo: payload.photo
       });
+      const res = await fetch(APPS_SCRIPT_URL + '?' + params.toString());
       const data = await res.json();
       if (data.success) {
         document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
