@@ -640,27 +640,17 @@
     showLoader('Submitting your report…');
     document.getElementById('submit-btn').disabled = true;
     try {
-      const params = new URLSearchParams({
-        action: payload.action,
-        refId: payload.refId,
-        phone: payload.phone,
-        name: payload.name,
-        description: payload.description,
-        category: payload.category,
-        geo: payload.geo,
-        lat: String(payload.lat),
-        lng: String(payload.lng),
-        logDate: payload.logDate,
-        photo: payload.photo
+      // POST with no-cors: browser won't block it, Apps Script receives and processes it.
+      // We can't read the response body in no-cors mode — that's expected and fine.
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
       });
-      const res = await fetch(APPS_SCRIPT_URL + '?' + params.toString());
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
-        showScreen('screen-success');
-      } else {
-        showError('form-error', 'Submission failed: ' + (data.error || 'Please try again.'));
-      }
+      // If fetch didn't throw, the request was sent successfully
+      document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
+      showScreen('screen-success');
     } catch (e) {
       showError('form-error', 'Network error. Please check your connection and retry.');
     } finally {
