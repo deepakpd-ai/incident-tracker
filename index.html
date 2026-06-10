@@ -453,7 +453,7 @@
   /* ── Init ── */
   window.onload = () => {
     setDateDisplay();
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec') {
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       document.getElementById('config-banner').style.display = 'block';
     }
     const saved = sessionStorage.getItem('s40_user');
@@ -478,7 +478,7 @@
     }
     const phone = '+91' + rawPhone;
 
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec') {
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       currentUser = { phone, name: 'Demo User' };
       sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
       enterFormScreen();
@@ -619,7 +619,7 @@
       photo: photoBase64 || ''
     };
 
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec') {
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       document.getElementById('ref-badge').textContent = 'Ref: ' + refId + ' (demo mode)';
       showScreen('screen-success');
       return;
