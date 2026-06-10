@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Sector 40 — Incident Reporter</title>
+  <style>
+    :root {
+      --brand: #1a5c3a;
+      --brand-light: #e8f4ee;
+      --brand-mid: #2e7d52;
+      --accent: #e8a020;
+      --text: #1a1a1a;
+      --text-muted: #5a6473;
+      --border: #d4dde6;
+      --surface: #ffffff;
+      --bg: #f2f5f0;
+      --danger: #c0392b;
+      --danger-light: #fdf0ef;
+      --success: #1a7a45;
+      --success-light: #eaf5ee;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+    }
+
+    /* ── APP SHELL ── */
+    .screen { display: none; flex-direction: column; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--brand);
+      color: #fff;
+      padding: 0 16px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+    }
+    .topbar-title { font-weight: 600; font-size: 15px; }
+    .topbar-sub { font-size: 11px; opacity: 0.72; }
+    .topbar-user {
+      font-size: 13px; opacity: 0.85; display: flex; align-items: center; gap: 6px;
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    }
+    .logout-btn:active { background: rgba(255,255,255,0.25); }
+
+    /* ── LOGIN SCREEN ── */
+    #screen-login {
+      background: var(--brand);
+      justify-content: center;
+      align-items: center;
+      padding: 32px 24px;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.18);
+    }
+    .login-emblem {
+      width: 64px; height: 64px;
+      background: var(--brand-light);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .login-emblem svg { width: 32px; height: 32px; fill: none; stroke: var(--brand); stroke-width: 2; }
+    .login-heading { text-align: center; margin-bottom: 4px; font-size: 20px; font-weight: 700; color: var(--brand); }
+    .login-sub { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+
+    label { font-size: 13px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px; }
+
+    .phone-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .phone-prefix {
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0 12px;
+      font-size: 15px; font-weight: 600; color: var(--text-muted);
+      display: flex; align-items: center; white-space: nowrap; flex-shrink: 0;
+    }
+    input[type="tel"], input[type="text"] {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 15px; color: var(--text); background: #fff;
+      outline: none; transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+    input:focus { border-color: var(--brand); }
+
+    .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:active { background: var(--brand-mid); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .msg-error {
+      background: var(--danger-light); color: var(--danger);
+      border: 1px solid #f5c6c2; border-radius: var(--radius-sm);
+      padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none;
+    }
+    .msg-success {
+      background: var(--success-light); color: var(--success);
+      border: 1px solid #b2dfc3; border-radius: var(--radius-sm);
+      padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none;
+    }
+
+    /* ── FORM SCREEN ── */
+    #screen-form { background: var(--bg); }
+    .form-body { padding: 16px; flex: 1; }
+
+    .form-card {
+      background: var(--surface); border-radius: var(--radius);
+      padding: 20px 16px; margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--brand);
+      margin-bottom: 14px;
+    }
+
+    textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 15px; color: var(--text); background: #fff;
+      resize: none; outline: none; font-family: inherit;
+      transition: border-color 0.15s; -webkit-appearance: none;
+    }
+    textarea:focus { border-color: var(--brand); }
+
+    /* responsibility chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .chip {
+      padding: 8px 14px; border-radius: 20px;
+      border: 1.5px solid var(--border);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      background: #fff; color: var(--text-muted);
+      transition: all 0.12s; -webkit-tap-highlight-color: transparent;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chip.selected {
+      background: var(--brand-light); border-color: var(--brand);
+      color: var(--brand); font-weight: 600;
+    }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* geo */
+    .geo-row { display: flex; gap: 8px; align-items: flex-start; }
+    .geo-row input { flex: 1; }
+    .geo-btn {
+      padding: 12px 14px; background: var(--brand-light);
+      border: 1.5px solid var(--brand); border-radius: var(--radius-sm);
+      color: var(--brand); font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .geo-btn:active { background: var(--brand); color: #fff; }
+    .geo-status { font-size: 12px; margin-top: 6px; }
+    .geo-status.ok { color: var(--success); }
+    .geo-status.err { color: var(--danger); }
+
+    /* date display */
+    .date-display {
+      padding: 12px 14px; background: var(--bg);
+      border-radius: var(--radius-sm); font-size: 15px;
+      color: var(--text-muted); border: 1.5px solid var(--border);
+    }
+
+    /* photo upload */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius-sm);
+      padding: 24px 16px; text-align: center; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: #fff;
+    }
+    .upload-zone:hover { border-color: var(--brand); background: var(--brand-light); }
+    .upload-zone input { display: none; }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-label { font-size: 14px; color: var(--text-muted); }
+    .upload-label span { color: var(--brand); font-weight: 600; }
+    .preview-img {
+      width: 100%; border-radius: var(--radius-sm); display: none;
+      margin-top: 12px; max-height: 200px; object-fit: cover;
+    }
+    .remove-photo {
+      margin-top: 8px; background: none; border: none;
+      color: var(--danger); font-size: 13px; cursor: pointer; padding: 4px;
+    }
+
+    /* submit area */
+    .submit-area { padding: 0 16px 32px; }
+    .submit-area .btn-primary { font-size: 16px; padding: 15px; border-radius: var(--radius); }
+
+    /* loader overlay */
+    .loader-overlay {
+      position: fixed; inset: 0; background: rgba(255,255,255,0.85);
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; z-index: 100;
+    }
+    .loader-overlay.show { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border); border-top-color: var(--brand);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 14px; color: var(--text-muted); }
+
+    /* ── SUCCESS SCREEN ── */
+    #screen-success {
+      background: var(--bg);
+      justify-content: center; align-items: center; padding: 32px 24px;
+    }
+    .success-card {
+      background: #fff; border-radius: 20px; padding: 40px 28px;
+      text-align: center; max-width: 360px; width: 100%;
+      border: 1px solid var(--border);
+    }
+    .success-icon {
+      width: 72px; height: 72px; background: var(--success-light);
+      border-radius: 50%; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .success-icon svg { width: 36px; height: 36px; stroke: var(--success); fill: none; stroke-width: 2.5; }
+    .success-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .success-detail { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+    .ref-badge {
+      background: var(--brand-light); color: var(--brand);
+      padding: 8px 16px; border-radius: 20px; font-size: 13px;
+      font-weight: 600; display: inline-block; margin-bottom: 28px;
+    }
+    .btn-secondary {
+      width: 100%; padding: 13px;
+      background: #fff; color: var(--brand);
+      border: 1.5px solid var(--brand); border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
+    }
+    .btn-secondary:active { background: var(--brand-light); }
+
+    /* category colors */
+    .dot-electrical { background: #f59e0b; }
+    .dot-water { background: #3b82f6; }
+    .dot-horticulture { background: #22c55e; }
+    .dot-roads { background: #8b5cf6; }
+    .dot-sewage { background: #78716c; }
+    .dot-others { background: #ec4899; }
+
+    .char-count { font-size: 12px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+    /* config banner */
+    .config-banner {
+      background: #fffbeb; border: 1px solid #fbbf24; border-radius: var(--radius-sm);
+      padding: 10px 14px; font-size: 12px; color: #92400e;
+      margin-bottom: 16px; display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text" id="loader-text">Please wait…</div>
+</div>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <div class="login-emblem">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="login-heading">Sector 40</div>
+    <div class="login-sub">Community Incident Reporter<br>RWA — Infrastructure Upkeep</div>
+
+    <label for="phone-input">Registered mobile number</label>
+    <div class="phone-row">
+      <div class="phone-prefix">+91</div>
+      <input type="tel" id="phone-input" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric" />
+    </div>
+    <div class="hint">Enter the 10-digit number registered with your RWA.</div>
+
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Verify &amp; Continue →</button>
+    <div class="msg-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══ FORM SCREEN ══ -->
+<div class="screen" id="screen-form">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">S40</div>
+      <div>
+        <div class="topbar-title">Incident Report</div>
+        <div class="topbar-sub">Sector 40 RWA</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="topbar-user" id="topbar-user"></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="config-banner" id="config-banner">
+      ⚙ Apps Script URL not configured. Open this file and set <strong>APPS_SCRIPT_URL</strong> at the top of the script tag.
+    </div>
+
+    <!-- Description -->
+    <div class="form-card">
+      <div class="section-label">What happened?</div>
+      <textarea id="f-description" rows="3" maxlength="300" placeholder="Describe the issue clearly, e.g. 'Street light on the corner of main road has been non-functional for 3 days…'" oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="char-count">0</span>/300</div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-card">
+      <div class="section-label">Responsibility area</div>
+      <div class="chips" id="chips">
+        <div class="chip" data-val="Electrical" onclick="selectChip(this)">
+          <span class="chip-dot dot-electrical"></span> Electrical
+        </div>
+        <div class="chip" data-val="Water" onclick="selectChip(this)">
+          <span class="chip-dot dot-water"></span> Water
+        </div>
+        <div class="chip" data-val="Horticulture" onclick="selectChip(this)">
+          <span class="chip-dot dot-horticulture"></span> Horticulture
+        </div>
+        <div class="chip" data-val="Roads" onclick="selectChip(this)">
+          <span class="chip-dot dot-roads"></span> Roads
+        </div>
+        <div class="chip" data-val="Sewage" onclick="selectChip(this)">
+          <span class="chip-dot dot-sewage"></span> Sewage
+        </div>
+        <div class="chip" data-val="Others" onclick="selectChip(this)">
+          <span class="chip-dot dot-others"></span> Others
+        </div>
+      </div>
+    </div>
+
+    <!-- Geo Location -->
+    <div class="form-card">
+      <div class="section-label">Location</div>
+      <div class="geo-row">
+        <input type="text" id="f-geo" placeholder="Tap 'Locate me' or enter manually" readonly />
+        <button class="geo-btn" onclick="getLocation()" id="geo-btn">
+          📍 Locate me
+        </button>
+      </div>
+      <div class="geo-status" id="geo-status"></div>
+    </div>
+
+    <!-- Date -->
+    <div class="form-card">
+      <div class="section-label">Log date</div>
+      <div class="date-display" id="f-date"></div>
+    </div>
+
+    <!-- Photo -->
+    <div class="form-card">
+      <div class="section-label">Photo (optional)</div>
+      <div class="upload-zone" onclick="document.getElementById('photo-input').click()">
+        <div class="upload-icon">📷</div>
+        <div class="upload-label"><span>Tap to upload a photo</span> or take one now</div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)" />
+      </div>
+      <img id="preview-img" class="preview-img" alt="Incident photo preview" />
+      <button id="remove-photo" class="remove-photo" style="display:none" onclick="removePhoto()">✕ Remove photo</button>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <div class="msg-error" id="form-error"></div>
+    <button class="btn-primary" id="submit-btn" onclick="submitForm()">Submit Incident Report</button>
+  </div>
+</div>
+
+<!-- ══ SUCCESS SCREEN ══ -->
+<div class="screen" id="screen-success">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="success-title">Report submitted!</div>
+    <div class="success-detail">
+      Your incident has been logged. The relevant team will be notified for follow-up.
+    </div>
+    <div class="ref-badge" id="ref-badge"></div>
+    <button class="btn-secondary" onclick="reportAnother()">Report another incident</button>
+    <button class="btn-primary" onclick="doLogout()">Done</button>
+  </div>
+</div>
+
+<script>
+  /* ────────────────────────────────────────────────
+     CONFIGURATION — paste your deployed Web App URL
+  ────────────────────────────────────────────────── */
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec';
+  /* ──────────────────────────────────────────────── */
+
+  let currentUser = null;
+  let selectedCategory = null;
+  let photoBase64 = null;
+  let geoCoords = null;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showLoader(msg) {
+    document.getElementById('loader-text').textContent = msg || 'Please wait…';
+    document.getElementById('loader').classList.add('show');
+  }
+  function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+
+  function showError(elId, msg) {
+    const el = document.getElementById(elId);
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+
+  /* ── Init ── */
+  window.onload = () => {
+    setDateDisplay();
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      document.getElementById('config-banner').style.display = 'block';
+    }
+    const saved = sessionStorage.getItem('s40_user');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+      enterFormScreen();
+    }
+  };
+
+  function setDateDisplay() {
+    const d = new Date();
+    document.getElementById('f-date').textContent =
+      d.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  /* ── LOGIN ── */
+  async function doLogin() {
+    const rawPhone = document.getElementById('phone-input').value.trim();
+    if (!/^\d{10}$/.test(rawPhone)) {
+      showError('login-error', 'Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    const phone = '+91' + rawPhone;
+
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      currentUser = { phone, name: 'Demo User' };
+      sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
+      enterFormScreen();
+      return;
+    }
+
+    showLoader('Verifying your number…');
+    document.getElementById('login-btn').disabled = true;
+    try {
+      const res = await fetch(APPS_SCRIPT_URL + '?action=auth&phone=' + encodeURIComponent(phone));
+      const data = await res.json();
+      if (data.success) {
+        currentUser = { phone, name: data.name };
+        sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
+        enterFormScreen();
+      } else {
+        showError('login-error', 'This number is not registered. Please contact your RWA admin.');
+      }
+    } catch (e) {
+      showError('login-error', 'Could not connect to the server. Please try again.');
+    } finally {
+      hideLoader();
+      document.getElementById('login-btn').disabled = false;
+    }
+  }
+
+  function enterFormScreen() {
+    document.getElementById('topbar-user').textContent = currentUser.name;
+    setDateDisplay();
+    showScreen('screen-form');
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem('s40_user');
+    currentUser = null; selectedCategory = null; photoBase64 = null; geoCoords = null;
+    document.getElementById('phone-input').value = '';
+    document.getElementById('f-description').value = '';
+    document.getElementById('f-geo').value = '';
+    document.getElementById('char-count').textContent = '0';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    removePhoto();
+    showScreen('screen-login');
+  }
+
+  /* ── FORM HELPERS ── */
+  function selectChip(el) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedCategory = el.getAttribute('data-val');
+  }
+
+  function updateCharCount() {
+    document.getElementById('char-count').textContent =
+      document.getElementById('f-description').value.length;
+  }
+
+  function getLocation() {
+    const btn = document.getElementById('geo-btn');
+    const status = document.getElementById('geo-status');
+    if (!navigator.geolocation) {
+      status.textContent = 'Geolocation not supported on this device.';
+      status.className = 'geo-status err'; return;
+    }
+    btn.textContent = '⏳ Locating…'; btn.disabled = true;
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        geoCoords = pos.coords;
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        document.getElementById('f-geo').value = lat + ', ' + lng;
+        status.textContent = '✓ Location captured (±' + Math.round(pos.coords.accuracy) + 'm accuracy)';
+        status.className = 'geo-status ok';
+        btn.textContent = '📍 Re-locate';
+        btn.disabled = false;
+      },
+      err => {
+        status.textContent = 'Could not get location. Enter manually or check permissions.';
+        status.className = 'geo-status err';
+        btn.textContent = '📍 Locate me'; btn.disabled = false;
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+
+  function handlePhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showError('form-error', 'Photo size must be under 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoBase64 = e.target.result;
+      document.getElementById('preview-img').src = photoBase64;
+      document.getElementById('preview-img').style.display = 'block';
+      document.getElementById('remove-photo').style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removePhoto() {
+    photoBase64 = null;
+    document.getElementById('photo-input').value = '';
+    document.getElementById('preview-img').style.display = 'none';
+    document.getElementById('preview-img').src = '';
+    document.getElementById('remove-photo').style.display = 'none';
+  }
+
+  /* ── SUBMIT ── */
+  async function submitForm() {
+    const desc = document.getElementById('f-description').value.trim();
+    const geo = document.getElementById('f-geo').value.trim();
+
+    if (!desc) { showError('form-error', 'Please describe the issue.'); return; }
+    if (!selectedCategory) { showError('form-error', 'Please select a responsibility area.'); return; }
+    if (!geo) { showError('form-error', 'Please capture or enter a location.'); return; }
+
+    const now = new Date();
+    const refId = 'S40-' + now.getFullYear() +
+      String(now.getMonth()+1).padStart(2,'0') +
+      String(now.getDate()).padStart(2,'0') + '-' +
+      String(now.getHours()).padStart(2,'0') +
+      String(now.getMinutes()).padStart(2,'0') +
+      String(now.getSeconds()).padStart(2,'0');
+
+    const payload = {
+      action: 'logIncident',
+      refId,
+      phone: currentUser.phone,
+      name: currentUser.name,
+      description: desc,
+      category: selectedCategory,
+      geo,
+      lat: geoCoords ? geoCoords.latitude : '',
+      lng: geoCoords ? geoCoords.longitude : '',
+      logDate: now.toLocaleString('en-IN'),
+      photo: photoBase64 || ''
+    };
+
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      document.getElementById('ref-badge').textContent = 'Ref: ' + refId + ' (demo mode)';
+      showScreen('screen-success');
+      return;
+    }
+
+    showLoader('Submitting your report…');
+    document.getElementById('submit-btn').disabled = true;
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
+        showScreen('screen-success');
+      } else {
+        showError('form-error', 'Submission failed: ' + (data.error || 'Please try again.'));
+      }
+    } catch (e) {
+      showError('form-error', 'Network error. Please check your connection and retry.');
+    } finally {
+      hideLoader();
+      document.getElementById('submit-btn').disabled = false;
+    }
+  }
+
+  function reportAnother() {
+    selectedCategory = null; photoBase64 = null; geoCoords = null;
+    document.getElementById('f-description').value = '';
+    document.getElementById('f-geo').value = '';
+    document.getElementById('char-count').textContent = '0';
+    document.getElementById('geo-status').textContent = '';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    removePhoto();
+    setDateDisplay();
+    showScreen('screen-form');
+  }
+
+  /* phone field — numbers only */
+  document.getElementById('phone-input').addEventListener('keypress', e => {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+  });
+  document.getElementById('phone-input').addEventListener('keyup', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+</script>
+</body>
+</html>
