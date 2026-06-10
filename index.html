@@ -566,16 +566,28 @@
   function handlePhoto(input) {
     const file = input.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      showError('form-error', 'Photo size must be under 5MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      showError('form-error', 'Photo size must be under 10MB.');
       return;
     }
     const reader = new FileReader();
     reader.onload = e => {
-      photoBase64 = e.target.result;
-      document.getElementById('preview-img').src = photoBase64;
+      // Show full quality preview
+      document.getElementById('preview-img').src = e.target.result;
       document.getElementById('preview-img').style.display = 'block';
       document.getElementById('remove-photo').style.display = 'inline-block';
+      // Compress to max 800px wide, quality 0.5 for upload
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 800;
+        const scale = img.width > maxW ? maxW / img.width : 1;
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
