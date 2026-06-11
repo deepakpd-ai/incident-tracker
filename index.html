@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Sector 40 — Incident Reporter</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+  <title>Sector 40 — Incident Tracker</title>
   <style>
-    :root {
-      --brand:#1a5c3a; --brand-light:#e8f4ee; --brand-mid:#2e7d52;
-      --text:#1a1a1a; --text-muted:#5a6473; --border:#d4dde6;
-      --surface:#fff; --bg:#f2f5f0;
-      --danger:#c0392b; --danger-light:#fdf0ef;
-      --success:#1a7a45; --success-light:#eaf5ee;
-      --radius:12px; --radius-sm:8px;
+    :root{
+      --brand:#1a5c3a;--brand-light:#e8f4ee;--brand-mid:#2e7d52;
+      --text:#1a1a1a;--text-muted:#5a6473;--border:#d4dde6;
+      --surface:#fff;--bg:#f2f5f0;
+      --danger:#c0392b;--danger-light:#fdf0ef;
+      --success:#1a7a45;--success-light:#eaf5ee;
+      --warning:#b45309;--warning-light:#fffbeb;
+      --radius:12px;--radius-sm:8px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
@@ -19,12 +20,20 @@
     .screen.active{display:flex;}
 
     /* TOPBAR */
-    .topbar{background:var(--brand);color:#fff;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .topbar{background:var(--brand);color:#fff;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0;}
     .topbar-brand{display:flex;align-items:center;gap:10px;}
     .topbar-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
     .topbar-title{font-weight:600;font-size:15px;}
     .topbar-sub{font-size:11px;opacity:.72;}
-    .logout-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;}
+    .topbar-actions{display:flex;align-items:center;gap:8px;}
+    .topbar-name{font-size:12px;opacity:.85;}
+    .icon-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;}
+    .icon-btn:active{background:rgba(255,255,255,.28);}
+
+    /* NAV TABS */
+    .nav-tabs{display:flex;background:var(--brand-mid);flex-shrink:0;}
+    .nav-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;}
+    .nav-tab.active{color:#fff;border-bottom-color:#fff;}
 
     /* LOGIN */
     #screen-login{background:var(--brand);justify-content:center;align-items:center;padding:32px 24px;}
@@ -39,14 +48,13 @@
     input[type="tel"],input[type="text"]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;color:var(--text);background:#fff;outline:none;transition:border-color .15s;-webkit-appearance:none;}
     input:focus{border-color:var(--brand);}
     .hint{font-size:12px;color:var(--text-muted);margin-bottom:20px;}
-    .btn-primary{width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;}
+    .btn-primary{width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
     .btn-primary:disabled{opacity:.55;cursor:not-allowed;}
-    .btn-secondary{width:100%;padding:13px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+    .btn-secondary{width:100%;padding:12px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;}
     .msg-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-top:12px;display:none;}
 
-    /* FORM */
-    #screen-form{background:var(--bg);}
-    .form-body{padding:16px;flex:1;}
+    /* FORM TAB */
+    .tab-body{padding:16px;flex:1;overflow-y:auto;}
     .form-card{background:var(--surface);border-radius:var(--radius);padding:20px 16px;margin-bottom:12px;border:1px solid var(--border);}
     .section-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--brand);margin-bottom:14px;}
     textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;color:var(--text);background:#fff;resize:none;outline:none;font-family:inherit;-webkit-appearance:none;}
@@ -60,23 +68,31 @@
     .geo-row{display:flex;gap:8px;}
     .geo-row input{flex:1;}
     .geo-btn{padding:12px 14px;background:var(--brand-light);border:1.5px solid var(--brand);border-radius:var(--radius-sm);color:var(--brand);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    .geo-btn:active{background:var(--brand);color:#fff;}
     .geo-status{font-size:12px;margin-top:6px;}
     .geo-status.ok{color:var(--success)}.geo-status.err{color:var(--danger)}
     .date-display{padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:15px;color:var(--text-muted);border:1.5px solid var(--border);}
-    .upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:24px 16px;text-align:center;cursor:pointer;background:#fff;}
+
+    /* PHOTO UPLOAD */
+    .upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:20px 16px;text-align:center;cursor:pointer;background:#fff;transition:all .15s;}
     .upload-zone:hover{border-color:var(--brand);background:var(--brand-light);}
     .upload-zone input{display:none;}
-    .upload-icon{font-size:32px;margin-bottom:8px;}
-    .upload-label{font-size:14px;color:var(--text-muted);}
+    .upload-icon{font-size:28px;margin-bottom:6px;}
+    .upload-label{font-size:13px;color:var(--text-muted);}
     .upload-label span{color:var(--brand);font-weight:600;}
-    .preview-img{width:100%;border-radius:var(--radius-sm);display:none;margin-top:12px;max-height:320px;object-fit:contain;}
-    .remove-photo{margin-top:8px;background:none;border:none;color:var(--danger);font-size:13px;cursor:pointer;padding:4px;}
+    .upload-progress{margin-top:10px;font-size:12px;color:var(--brand);display:none;}
+    .upload-progress.show{display:block;}
+    .preview-wrap{margin-top:12px;display:none;}
+    .preview-wrap.show{display:block;}
+    .preview-img{width:100%;border-radius:var(--radius-sm);max-height:260px;object-fit:contain;}
+    .remove-photo{margin-top:6px;background:none;border:none;color:var(--danger);font-size:13px;cursor:pointer;padding:4px;}
+
     .submit-area{padding:0 16px 32px;}
     .submit-area .btn-primary{font-size:16px;padding:15px;border-radius:var(--radius);}
     .form-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:10px;display:none;}
 
     /* LOADER */
-    .loader-overlay{position:fixed;inset:0;background:rgba(255,255,255,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:100;}
+    .loader-overlay{position:fixed;inset:0;background:rgba(255,255,255,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:100;}
     .loader-overlay.show{display:flex;}
     .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
@@ -88,8 +104,45 @@
     .success-icon{width:72px;height:72px;background:var(--success-light);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;}
     .success-icon svg{width:36px;height:36px;stroke:var(--success);fill:none;stroke-width:2.5;}
     .success-title{font-size:22px;font-weight:700;margin-bottom:10px;}
-    .success-detail{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:28px;}
+    .success-detail{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;}
     .ref-badge{background:var(--brand-light);color:var(--brand);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;display:inline-block;margin-bottom:28px;}
+
+    /* ISSUES REPORT */
+    .report-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--border);}
+    .report-count{font-size:13px;color:var(--text-muted);}
+    .refresh-btn{background:var(--brand-light);border:1px solid var(--brand);color:var(--brand);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+    .issues-list{padding:12px 16px;flex:1;overflow-y:auto;}
+    .issue-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+    .issue-card-header{padding:14px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+    .issue-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .cat-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+    .cat-Electrical{background:#fef3c7;color:#92400e;}
+    .cat-Water{background:#dbeafe;color:#1e40af;}
+    .cat-Horticulture{background:#dcfce7;color:#166534;}
+    .cat-Roads{background:#ede9fe;color:#5b21b6;}
+    .cat-Sewage{background:#f5f5f4;color:#44403c;}
+    .cat-Others{background:#fce7f3;color:#9d174d;}
+    .status-badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+    .status-Open{background:#fef9c3;color:#854d0e;}
+    .status-Closed{background:#dcfce7;color:#166534;}
+    .issue-ref{font-size:11px;color:var(--text-muted);}
+    .issue-desc{padding:0 16px 10px;font-size:14px;line-height:1.5;color:var(--text);}
+    .issue-photo{width:100%;max-height:220px;object-fit:cover;display:block;cursor:pointer;}
+    .issue-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+    .issue-info{font-size:12px;color:var(--text-muted);line-height:1.6;}
+    .close-btn{background:var(--success-light);border:1px solid var(--success);color:var(--success);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+    .close-btn:active{background:var(--success);color:#fff;}
+    .empty-state{text-align:center;padding:60px 24px;color:var(--text-muted);}
+    .empty-icon{font-size:48px;margin-bottom:12px;}
+    .empty-text{font-size:15px;font-weight:600;margin-bottom:6px;}
+    .empty-sub{font-size:13px;}
+    .loading-issues{text-align:center;padding:40px;color:var(--text-muted);font-size:14px;}
+
+    /* PHOTO LIGHTBOX */
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+    .lightbox.show{display:flex;}
+    .lightbox img{max-width:100%;max-height:90vh;border-radius:8px;object-fit:contain;}
+    .lightbox-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
   </style>
 </head>
 <body>
@@ -99,10 +152,14 @@
   <div class="loader-text" id="loader-text">Please wait…</div>
 </div>
 
-<!-- Hidden iframe — receives Google Form response, prevents page navigation -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="Incident photo"/>
+</div>
+
 <iframe name="hidden-target" style="display:none"></iframe>
 
-<!-- LOGIN -->
+<!-- ══ LOGIN ══ -->
 <div class="screen active" id="screen-login">
   <div class="login-card">
     <div class="login-emblem">
@@ -121,20 +178,26 @@
   </div>
 </div>
 
-<!-- FORM -->
-<div class="screen" id="screen-form">
+<!-- ══ MAIN APP ══ -->
+<div class="screen" id="screen-app">
   <div class="topbar">
     <div class="topbar-brand">
       <div class="topbar-logo">S40</div>
-      <div><div class="topbar-title">Incident Report</div><div class="topbar-sub">Sector 40 RWA</div></div>
+      <div><div class="topbar-title">Sector 40 RWA</div><div class="topbar-sub">Incident Tracker</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;opacity:.85" id="topbar-user"></span>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    <div class="topbar-actions">
+      <span class="topbar-name" id="topbar-user"></span>
+      <button class="icon-btn" onclick="doLogout()">Logout</button>
     </div>
   </div>
 
-  <div class="form-body">
+  <div class="nav-tabs">
+    <div class="nav-tab active" id="tab-report" onclick="switchTab('report')">📝 Report Issue</div>
+    <div class="nav-tab" id="tab-issues" onclick="switchTab('issues')">📋 Open Issues</div>
+  </div>
+
+  <!-- REPORT ISSUE TAB -->
+  <div id="panel-report" class="tab-body">
     <div class="form-card">
       <div class="section-label">What happened?</div>
       <textarea id="f-description" rows="3" maxlength="300" placeholder="e.g. Street light at C-112 corner non-functional for 3 days…" oninput="document.getElementById('char-count').textContent=this.value.length"></textarea>
@@ -174,18 +237,32 @@
         <div class="upload-label"><span>Tap to upload</span> or take a photo</div>
         <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)"/>
       </div>
-      <img id="preview-img" class="preview-img" alt="Preview"/>
-      <button id="remove-photo" class="remove-photo" style="display:none" onclick="removePhoto()">✕ Remove photo</button>
+      <div class="upload-progress" id="upload-progress">⏳ Uploading photo…</div>
+      <div class="preview-wrap" id="preview-wrap">
+        <img id="preview-img" class="preview-img" alt="Preview"/>
+        <button class="remove-photo" onclick="removePhoto()">✕ Remove photo</button>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="form-error" id="form-error"></div>
+      <button class="btn-primary" id="submit-btn" onclick="submitForm()">Submit Incident Report</button>
     </div>
   </div>
 
-  <div class="submit-area">
-    <div class="form-error" id="form-error"></div>
-    <button class="btn-primary" id="submit-btn" onclick="submitForm()">Submit Incident Report</button>
+  <!-- OPEN ISSUES TAB -->
+  <div id="panel-issues" style="display:none;flex-direction:column;flex:1;">
+    <div class="report-header">
+      <div class="report-count" id="report-count">Loading…</div>
+      <button class="refresh-btn" onclick="loadIssues()">↻ Refresh</button>
+    </div>
+    <div class="issues-list" id="issues-list">
+      <div class="loading-issues">Loading open issues…</div>
+    </div>
   </div>
 </div>
 
-<!-- SUCCESS -->
+<!-- ══ SUCCESS ══ -->
 <div class="screen" id="screen-success">
   <div class="success-card">
     <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -193,218 +270,274 @@
     <div class="success-detail">Your incident has been logged. The relevant team will be notified.</div>
     <div class="ref-badge" id="ref-badge"></div>
     <button class="btn-secondary" onclick="reportAnother()">Report another incident</button>
-    <button class="btn-primary" onclick="doLogout()">Done</button>
+    <button class="btn-primary" onclick="goToIssues()">View open issues</button>
   </div>
 </div>
 
 <script>
-  /* ── CONFIGURATION ── */
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec'; // for login auth only
+  /* ══ CONFIGURATION ══ */
+  const APPS_SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec';
+  const CLOUDINARY_CLOUD = 'dh4z3ndbj';
+  const CLOUDINARY_PRESET= 'IncidentTrackerS40';
   const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSf8yrZf6IrJtI9rQ8tW6PRCSMuwzbrZ8zZmp1JyUHNvozoi_w/formResponse';
   const ENTRY = {
-    refId:       'entry.1333853772',
-    logDate:     'entry.158441778',
-    name:        'entry.847639464',
-    phone:       'entry.419169709',
-    category:    'entry.502866980',
-    description: 'entry.2023020809',
-    geo:         'entry.1936879431',
-    lat:         'entry.82740247',
-    lng:         'entry.1066923439',
-    photo:       'entry.1010889013'
+    refId:'entry.1333853772', logDate:'entry.158441778', name:'entry.847639464',
+    phone:'entry.419169709', category:'entry.502866980', description:'entry.2023020809',
+    geo:'entry.1936879431', lat:'entry.82740247', lng:'entry.1066923439', photo:'entry.1010889013'
   };
-  /* ────────────────── */
+  /* ══════════════════ */
 
-  let currentUser = null, selectedCategory = null, photoBase64 = null, geoCoords = null;
+  let currentUser=null, selectedCategory=null, photoUrl=null, geoCoords=null;
 
-  function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-  function showLoader(m) { document.getElementById('loader-text').textContent=m||'Please wait…'; document.getElementById('loader').classList.add('show'); }
-  function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+  /* ── Screens ── */
+  function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+  function showLoader(m){document.getElementById('loader-text').textContent=m||'Please wait…';document.getElementById('loader').classList.add('show');}
+  function hideLoader(){document.getElementById('loader').classList.remove('show');}
 
-  window.onload = () => {
+  window.onload=()=>{
     setDateDisplay();
-    const saved = sessionStorage.getItem('s40_user');
-    if (saved) { currentUser = JSON.parse(saved); enterFormScreen(); }
+    const saved=sessionStorage.getItem('s40_user');
+    if(saved){currentUser=JSON.parse(saved);enterApp();}
   };
 
-  function setDateDisplay() {
-    document.getElementById('f-date').textContent =
-      new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  function setDateDisplay(){
+    document.getElementById('f-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   }
 
-  /* ── LOGIN via JSONP ── */
-  function jsonpCall(params) {
-    return new Promise((resolve, reject) => {
-      const cb = 'cb_' + Date.now();
-      const timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); }, 15000);
-      function cleanup(){ delete window[cb]; const s=document.getElementById(cb); if(s) s.remove(); }
-      window[cb] = data => { clearTimeout(timer); cleanup(); resolve(data); };
-      const qs = Object.entries({...params, callback:cb}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
-      const s = document.createElement('script');
-      s.id = cb;
-      s.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('Network error')); };
-      s.src = APPS_SCRIPT_URL + '?' + qs;
+  /* ── Tab switching ── */
+  function switchTab(tab){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+tab).classList.add('active');
+    document.getElementById('panel-report').style.display = tab==='report'?'block':'none';
+    document.getElementById('panel-issues').style.display = tab==='issues'?'flex':'none';
+    if(tab==='issues') loadIssues();
+  }
+
+  /* ── JSONP helper ── */
+  function jsonpCall(params){
+    return new Promise((resolve,reject)=>{
+      const cb='cb_'+Date.now();
+      const timer=setTimeout(()=>{cleanup();reject(new Error('timeout'));},15000);
+      function cleanup(){delete window[cb];const s=document.getElementById(cb);if(s)s.remove();}
+      window[cb]=data=>{clearTimeout(timer);cleanup();resolve(data);};
+      const qs=Object.entries({...params,callback:cb}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+      const s=document.createElement('script');s.id=cb;
+      s.onerror=()=>{clearTimeout(timer);cleanup();reject(new Error('Network error'));};
+      s.src=APPS_SCRIPT_URL+'?'+qs;
       document.head.appendChild(s);
     });
   }
 
-  async function doLogin() {
-    const raw = document.getElementById('phone-input').value.trim();
-    if (!/^\d{10}$/.test(raw)) { showLoginError('Please enter a valid 10-digit mobile number.'); return; }
-    const phone = '+91' + raw;
+  /* ── LOGIN ── */
+  async function doLogin(){
+    const raw=document.getElementById('phone-input').value.trim();
+    if(!/^\d{10}$/.test(raw)){showLoginError('Please enter a valid 10-digit mobile number.');return;}
+    const phone='+91'+raw;
 
-    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-      currentUser = { phone, name: 'Demo User' };
-      sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
-      enterFormScreen(); return;
+    if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+      currentUser={phone,name:'Demo User'};
+      sessionStorage.setItem('s40_user',JSON.stringify(currentUser));
+      enterApp();return;
     }
-
     showLoader('Verifying…');
-    document.getElementById('login-btn').disabled = true;
-    try {
-      const data = await jsonpCall({ action:'auth', phone });
-      if (data.success) {
-        currentUser = { phone, name: data.name };
-        sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
-        enterFormScreen();
-      } else {
-        showLoginError('Number not registered. Contact your RWA admin.');
-      }
-    } catch(e) {
-      showLoginError('Could not connect. Please try again.');
-    } finally {
-      hideLoader();
-      document.getElementById('login-btn').disabled = false;
-    }
+    document.getElementById('login-btn').disabled=true;
+    try{
+      const data=await jsonpCall({action:'auth',phone});
+      if(data.success){
+        currentUser={phone,name:data.name};
+        sessionStorage.setItem('s40_user',JSON.stringify(currentUser));
+        enterApp();
+      }else{showLoginError('Number not registered. Contact your RWA admin.');}
+    }catch(e){showLoginError('Could not connect. Please try again.');}
+    finally{hideLoader();document.getElementById('login-btn').disabled=false;}
   }
-
-  function showLoginError(msg) { const el=document.getElementById('login-error'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',6000); }
-
-  function enterFormScreen() {
-    document.getElementById('topbar-user').textContent = currentUser.name;
-    setDateDisplay(); showScreen('screen-form');
-  }
-
-  function doLogout() {
-    sessionStorage.removeItem('s40_user');
-    currentUser=null; selectedCategory=null; photoBase64=null; geoCoords=null;
-    document.getElementById('phone-input').value='';
-    document.getElementById('f-description').value='';
-    document.getElementById('f-geo').value='';
-    document.getElementById('char-count').textContent='0';
+  function showLoginError(msg){const el=document.getElementById('login-error');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',6000);}
+  function enterApp(){document.getElementById('topbar-user').textContent=currentUser.name;setDateDisplay();showScreen('screen-app');}
+  function doLogout(){
+    sessionStorage.removeItem('s40_user');currentUser=null;selectedCategory=null;photoUrl=null;geoCoords=null;
+    document.getElementById('phone-input').value='';document.getElementById('f-description').value='';
+    document.getElementById('f-geo').value='';document.getElementById('char-count').textContent='0';
     document.getElementById('geo-status').textContent='';
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-    removePhoto(); showScreen('screen-login');
+    removePhoto();showScreen('screen-login');
   }
 
-  function selectChip(el) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedCategory=el.getAttribute('data-val'); }
+  /* ── FORM HELPERS ── */
+  function selectChip(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedCategory=el.getAttribute('data-val');}
 
-  function getLocation() {
-    const btn=document.getElementById('geo-btn'), status=document.getElementById('geo-status');
-    if (!navigator.geolocation) { status.textContent='Not supported.'; status.className='geo-status err'; return; }
-    btn.textContent='⏳ Locating…'; btn.disabled=true;
+  function getLocation(){
+    const btn=document.getElementById('geo-btn'),status=document.getElementById('geo-status');
+    if(!navigator.geolocation){status.textContent='Not supported.';status.className='geo-status err';return;}
+    btn.textContent='⏳ Locating…';btn.disabled=true;
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        geoCoords=pos.coords;
-        document.getElementById('f-geo').value=pos.coords.latitude.toFixed(6)+', '+pos.coords.longitude.toFixed(6);
-        status.textContent='✓ Location captured (±'+Math.round(pos.coords.accuracy)+'m)';
-        status.className='geo-status ok'; btn.textContent='📍 Re-locate'; btn.disabled=false;
-      },
-      () => { status.textContent='Could not get location. Enter manually.'; status.className='geo-status err'; btn.textContent='📍 Locate me'; btn.disabled=false; },
+      pos=>{geoCoords=pos.coords;document.getElementById('f-geo').value=pos.coords.latitude.toFixed(6)+', '+pos.coords.longitude.toFixed(6);status.textContent='✓ Captured (±'+Math.round(pos.coords.accuracy)+'m)';status.className='geo-status ok';btn.textContent='📍 Re-locate';btn.disabled=false;},
+      ()=>{status.textContent='Could not get location. Enter manually.';status.className='geo-status err';btn.textContent='📍 Locate me';btn.disabled=false;},
       {enableHighAccuracy:true,timeout:12000}
     );
   }
 
-  function handlePhoto(input) {
-    const file=input.files[0]; if (!file) return;
+  async function handlePhoto(input){
+    const file=input.files[0];if(!file)return;
+    // Show preview immediately
     const reader=new FileReader();
     reader.onload=e=>{
       document.getElementById('preview-img').src=e.target.result;
-      document.getElementById('preview-img').style.display='block';
-      document.getElementById('remove-photo').style.display='inline-block';
-      const img=new Image();
-      img.onload=()=>{
-        const canvas=document.createElement('canvas');
-        const scale=img.width>800?800/img.width:1;
-        canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale);
-        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-        photoBase64=canvas.toDataURL('image/jpeg',0.5);
-      };
-      img.src=e.target.result;
+      document.getElementById('preview-wrap').classList.add('show');
     };
     reader.readAsDataURL(file);
+    // Upload to Cloudinary
+    document.getElementById('upload-progress').classList.add('show');
+    document.getElementById('submit-btn').disabled=true;
+    try{
+      const fd=new FormData();
+      fd.append('file',file);
+      fd.append('upload_preset',CLOUDINARY_PRESET);
+      const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.secure_url){
+        photoUrl=data.secure_url;
+        document.getElementById('upload-progress').textContent='✓ Photo uploaded successfully';
+      }else{
+        document.getElementById('upload-progress').textContent='Photo upload failed — will submit without photo';
+        photoUrl=null;
+      }
+    }catch(e){
+      document.getElementById('upload-progress').textContent='Photo upload failed — will submit without photo';
+      photoUrl=null;
+    }finally{
+      document.getElementById('submit-btn').disabled=false;
+    }
   }
 
-  function removePhoto() {
-    photoBase64=null; document.getElementById('photo-input').value='';
-    document.getElementById('preview-img').style.display='none';
+  function removePhoto(){
+    photoUrl=null;
+    document.getElementById('photo-input').value='';
+    document.getElementById('preview-wrap').classList.remove('show');
     document.getElementById('preview-img').src='';
-    document.getElementById('remove-photo').style.display='none';
+    document.getElementById('upload-progress').classList.remove('show');
+    document.getElementById('upload-progress').textContent='⏳ Uploading photo…';
   }
 
-  /* ── SUBMIT to Google Form via hidden iframe ── */
-  function submitForm() {
-    const desc = document.getElementById('f-description').value.trim();
-    const geo  = document.getElementById('f-geo').value.trim();
-    if (!desc) { showFormError('Please describe the issue.'); return; }
-    if (!selectedCategory) { showFormError('Please select a responsibility area.'); return; }
-    if (!geo)  { showFormError('Please capture or enter a location.'); return; }
+  /* ── SUBMIT via Google Forms hidden iframe ── */
+  function submitForm(){
+    const desc=document.getElementById('f-description').value.trim();
+    const geo=document.getElementById('f-geo').value.trim();
+    if(!desc){showFormError('Please describe the issue.');return;}
+    if(!selectedCategory){showFormError('Please select a responsibility area.');return;}
+    if(!geo){showFormError('Please capture or enter a location.');return;}
 
-    const refId   = makeRefId();
-    const logDate = new Date().toLocaleString('en-IN');
+    const refId=makeRefId();
+    const logDate=new Date().toLocaleString('en-IN');
 
-    // Build hidden form targeting the invisible iframe
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = FORM_ACTION;
-    form.target = 'hidden-target';
-
-    const data = {
-      [ENTRY.refId]:       refId,
-      [ENTRY.logDate]:     logDate,
-      [ENTRY.name]:        currentUser.name,
-      [ENTRY.phone]:       currentUser.phone,
-      [ENTRY.category]:    selectedCategory,
-      [ENTRY.description]: desc,
-      [ENTRY.geo]:         geo,
-      [ENTRY.lat]:         geoCoords ? String(geoCoords.latitude)  : '',
-      [ENTRY.lng]:         geoCoords ? String(geoCoords.longitude) : '',
-      [ENTRY.photo]:       photoBase64 ? '[photo attached — ' + Math.round(photoBase64.length/1024) + 'KB]' : ''
+    const form=document.createElement('form');
+    form.method='POST';form.action=FORM_ACTION;form.target='hidden-target';
+    const data={
+      [ENTRY.refId]:refId,[ENTRY.logDate]:logDate,
+      [ENTRY.name]:currentUser.name,[ENTRY.phone]:currentUser.phone,
+      [ENTRY.category]:selectedCategory,[ENTRY.description]:desc,
+      [ENTRY.geo]:geo,
+      [ENTRY.lat]:geoCoords?String(geoCoords.latitude):'',
+      [ENTRY.lng]:geoCoords?String(geoCoords.longitude):'',
+      [ENTRY.photo]:photoUrl||''
     };
+    Object.entries(data).forEach(([k,v])=>{const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;form.appendChild(i);});
+    document.body.appendChild(form);form.submit();document.body.removeChild(form);
 
-    Object.entries(data).forEach(([k,v])=>{
-      const inp=document.createElement('input');
-      inp.type='hidden'; inp.name=k; inp.value=v;
-      form.appendChild(inp);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
-
-    // Show success immediately — Google Forms receives POST reliably
-    document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
+    document.getElementById('ref-badge').textContent='Ref: '+refId;
     showScreen('screen-success');
   }
 
-  function makeRefId() {
-    const n=new Date();
-    return 'S40-'+n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+String(n.getHours()).padStart(2,'0')+String(n.getMinutes()).padStart(2,'0')+String(n.getSeconds()).padStart(2,'0');
-  }
-  function showFormError(msg) { const el=document.getElementById('form-error'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',5000); }
+  /* ── LOAD OPEN ISSUES via JSONP ── */
+  async function loadIssues(){
+    document.getElementById('issues-list').innerHTML='<div class="loading-issues">⏳ Loading open issues…</div>';
+    document.getElementById('report-count').textContent='Loading…';
 
-  function reportAnother() {
-    selectedCategory=null; photoBase64=null; geoCoords=null;
-    document.getElementById('f-description').value='';
-    document.getElementById('f-geo').value='';
-    document.getElementById('char-count').textContent='0';
-    document.getElementById('geo-status').textContent='';
+    if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+      renderIssues(getDemoIssues());return;
+    }
+    try{
+      const data=await jsonpCall({action:'getOpenIssues'});
+      if(data.success) renderIssues(data.issues);
+      else document.getElementById('issues-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load issues</div><div class="empty-sub">'+data.error+'</div></div>';
+    }catch(e){
+      document.getElementById('issues-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Connection error</div><div class="empty-sub">Please check your connection and refresh</div></div>';
+    }
+  }
+
+  function renderIssues(issues){
+    const open=issues.filter(i=>i.status==='Open');
+    document.getElementById('report-count').textContent=open.length+' open issue'+(open.length!==1?'s':'');
+    if(open.length===0){
+      document.getElementById('issues-list').innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No open issues</div><div class="empty-sub">All incidents are resolved!</div></div>';
+      return;
+    }
+    document.getElementById('issues-list').innerHTML=open.map(issue=>`
+      <div class="issue-card" id="card-${issue.refId}">
+        <div class="issue-card-header">
+          <div>
+            <div class="issue-meta">
+              <span class="cat-badge cat-${issue.category}">${issue.category}</span>
+              <span class="status-badge status-${issue.status}">${issue.status}</span>
+            </div>
+            <div class="issue-ref" style="margin-top:5px">${issue.refId} · ${issue.logDate}</div>
+          </div>
+        </div>
+        <div class="issue-desc">${escHtml(issue.description)}</div>
+        ${issue.photo?`<img class="issue-photo" src="${issue.photo}" alt="Incident photo" onclick="openLightbox('${issue.photo}')"/>`:'' }
+        <div class="issue-footer">
+          <div class="issue-info">
+            📍 ${escHtml(issue.geo)}<br>
+            👤 ${escHtml(issue.name)}
+          </div>
+          ${issue.phone===currentUser.phone?`<button class="close-btn" onclick="closeIssue('${issue.refId}',this)">✓ Mark Closed</button>`:''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ── CLOSE ISSUE ── */
+  async function closeIssue(refId,btn){
+    if(!confirm('Mark this issue as Closed?'))return;
+    btn.disabled=true;btn.textContent='Closing…';
+    try{
+      const data=await jsonpCall({action:'closeIssue',refId,phone:currentUser.phone});
+      if(data.success){
+        const card=document.getElementById('card-'+refId);
+        if(card){card.style.opacity='0.5';card.style.transition='opacity .4s';setTimeout(()=>card.remove(),400);}
+        const countEl=document.getElementById('report-count');
+        const n=parseInt(countEl.textContent)||1;
+        countEl.textContent=(n-1)+' open issue'+((n-1)!==1?'s':'');
+      }else{btn.disabled=false;btn.textContent='✓ Mark Closed';alert('Could not close: '+(data.error||'Please try again.'));}
+    }catch(e){btn.disabled=false;btn.textContent='✓ Mark Closed';alert('Connection error. Please try again.');}
+  }
+
+  /* ── LIGHTBOX ── */
+  function openLightbox(src){document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.add('show');}
+  function closeLightbox(){document.getElementById('lightbox').classList.remove('show');}
+
+  /* ── HELPERS ── */
+  function makeRefId(){const n=new Date();return 'S40-'+n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+String(n.getHours()).padStart(2,'0')+String(n.getMinutes()).padStart(2,'0')+String(n.getSeconds()).padStart(2,'0');}
+  function showFormError(msg){const el=document.getElementById('form-error');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
+  function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function reportAnother(){
+    selectedCategory=null;photoUrl=null;geoCoords=null;
+    document.getElementById('f-description').value='';document.getElementById('f-geo').value='';
+    document.getElementById('char-count').textContent='0';document.getElementById('geo-status').textContent='';
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-    removePhoto(); setDateDisplay(); showScreen('screen-form');
+    removePhoto();setDateDisplay();showScreen('screen-app');switchTab('report');
+  }
+  function goToIssues(){showScreen('screen-app');switchTab('issues');}
+
+  function getDemoIssues(){
+    return[
+      {refId:'S40-20260610-110000',logDate:'10/06/2026, 11:00:00',name:'Deepak Prasad',phone:currentUser.phone,category:'Electrical',description:'Street light near C-112 not working for 3 days.',geo:'Near C-112',photo:'',status:'Open'},
+      {refId:'S40-20260609-090000',logDate:'09/06/2026, 9:00:00',name:'Priya Sharma',phone:'+919999999999',category:'Water',description:'Broken water pipe near the park entrance causing flooding on the footpath.',geo:'Near Park Gate, Sector 40',photo:'',status:'Open'}
+    ];
   }
 
-  document.getElementById('phone-input').addEventListener('keypress',e=>{ if(!/[0-9]/.test(e.key)) e.preventDefault(); });
-  document.getElementById('phone-input').addEventListener('keyup',e=>{ if(e.key==='Enter') doLogin(); });
+  document.getElementById('phone-input').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
+  document.getElementById('phone-input').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
 </script>
 </body>
 </html>
