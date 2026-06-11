@@ -6,102 +6,90 @@
   <title>Sector 40 — Incident Reporter</title>
   <style>
     :root {
-      --brand: #1a5c3a; --brand-light: #e8f4ee; --brand-mid: #2e7d52;
-      --text: #1a1a1a; --text-muted: #5a6473; --border: #d4dde6;
-      --surface: #ffffff; --bg: #f2f5f0;
-      --danger: #c0392b; --danger-light: #fdf0ef;
-      --success: #1a7a45; --success-light: #eaf5ee;
-      --radius: 12px; --radius-sm: 8px;
+      --brand:#1a5c3a; --brand-light:#e8f4ee; --brand-mid:#2e7d52;
+      --text:#1a1a1a; --text-muted:#5a6473; --border:#d4dde6;
+      --surface:#fff; --bg:#f2f5f0;
+      --danger:#c0392b; --danger-light:#fdf0ef;
+      --success:#1a7a45; --success-light:#eaf5ee;
+      --radius:12px; --radius-sm:8px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; }
-
-    .screen { display: none; flex-direction: column; min-height: 100vh; }
-    .screen.active { display: flex; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
+    .screen{display:none;flex-direction:column;min-height:100vh;}
+    .screen.active{display:flex;}
 
     /* TOPBAR */
-    .topbar { background: var(--brand); color: #fff; padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-    .topbar-brand { display: flex; align-items: center; gap: 10px; }
-    .topbar-logo { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
-    .topbar-title { font-weight: 600; font-size: 15px; }
-    .topbar-sub { font-size: 11px; opacity: 0.72; }
-    .logout-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .topbar{background:var(--brand);color:#fff;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .topbar-brand{display:flex;align-items:center;gap:10px;}
+    .topbar-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+    .topbar-title{font-weight:600;font-size:15px;}
+    .topbar-sub{font-size:11px;opacity:.72;}
+    .logout-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;}
 
     /* LOGIN */
-    #screen-login { background: var(--brand); justify-content: center; align-items: center; padding: 32px 24px; }
-    .login-card { background: #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 40px rgba(0,0,0,0.18); }
-    .login-emblem { width: 64px; height: 64px; background: var(--brand-light); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-    .login-emblem svg { width: 32px; height: 32px; fill: none; stroke: var(--brand); stroke-width: 2; }
-    .login-heading { text-align: center; font-size: 20px; font-weight: 700; color: var(--brand); margin-bottom: 4px; }
-    .login-sub { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
-
-    label { font-size: 13px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px; }
-    .phone-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .phone-prefix { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; font-size: 15px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; flex-shrink: 0; }
-    input[type="tel"], input[type="text"] { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); background: #fff; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-    input:focus { border-color: var(--brand); }
-    .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
-
-    .btn-primary { width: 100%; padding: 14px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .btn-primary:active { background: var(--brand-mid); }
-    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btn-secondary { width: 100%; padding: 13px; background: #fff; color: var(--brand); border: 1.5px solid var(--brand); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
-
-    .msg-error { background: var(--danger-light); color: var(--danger); border: 1px solid #f5c6c2; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none; }
+    #screen-login{background:var(--brand);justify-content:center;align-items:center;padding:32px 24px;}
+    .login-card{background:#fff;border-radius:20px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 4px 40px rgba(0,0,0,.18);}
+    .login-emblem{width:64px;height:64px;background:var(--brand-light);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+    .login-emblem svg{width:32px;height:32px;fill:none;stroke:var(--brand);stroke-width:2;}
+    .login-heading{text-align:center;font-size:20px;font-weight:700;color:var(--brand);margin-bottom:4px;}
+    .login-sub{text-align:center;font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.5;}
+    label{font-size:13px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px;}
+    .phone-row{display:flex;gap:8px;margin-bottom:8px;}
+    .phone-prefix{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;font-size:15px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;flex-shrink:0;}
+    input[type="tel"],input[type="text"]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;color:var(--text);background:#fff;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+    input:focus{border-color:var(--brand);}
+    .hint{font-size:12px;color:var(--text-muted);margin-bottom:20px;}
+    .btn-primary{width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;}
+    .btn-primary:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-secondary{width:100%;padding:13px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+    .msg-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-top:12px;display:none;}
 
     /* FORM */
-    #screen-form { background: var(--bg); }
-    .form-body { padding: 16px; flex: 1; }
-    .form-card { background: var(--surface); border-radius: var(--radius); padding: 20px 16px; margin-bottom: 12px; border: 1px solid var(--border); }
-    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--brand); margin-bottom: 14px; }
-
-    textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); background: #fff; resize: none; outline: none; font-family: inherit; transition: border-color 0.15s; -webkit-appearance: none; }
-    textarea:focus { border-color: var(--brand); }
-    .char-count { font-size: 12px; color: var(--text-muted); text-align: right; margin-top: 4px; }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-    .chip { padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 500; cursor: pointer; background: #fff; color: var(--text-muted); transition: all 0.12s; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 6px; }
-    .chip.selected { background: var(--brand-light); border-color: var(--brand); color: var(--brand); font-weight: 600; }
-    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .dot-electrical{background:#f59e0b} .dot-water{background:#3b82f6} .dot-horticulture{background:#22c55e} .dot-roads{background:#8b5cf6} .dot-sewage{background:#78716c} .dot-others{background:#ec4899}
-
-    .geo-row { display: flex; gap: 8px; align-items: flex-start; }
-    .geo-row input { flex: 1; }
-    .geo-btn { padding: 12px 14px; background: var(--brand-light); border: 1.5px solid var(--brand); border-radius: var(--radius-sm); color: var(--brand); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .geo-btn:active { background: var(--brand); color: #fff; }
-    .geo-status { font-size: 12px; margin-top: 6px; }
-    .geo-status.ok { color: var(--success); } .geo-status.err { color: var(--danger); }
-
-    .date-display { padding: 12px 14px; background: var(--bg); border-radius: var(--radius-sm); font-size: 15px; color: var(--text-muted); border: 1.5px solid var(--border); }
-
-    .upload-zone { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 24px 16px; text-align: center; cursor: pointer; background: #fff; }
-    .upload-zone:hover { border-color: var(--brand); background: var(--brand-light); }
-    .upload-zone input { display: none; }
-    .upload-icon { font-size: 32px; margin-bottom: 8px; }
-    .upload-label { font-size: 14px; color: var(--text-muted); }
-    .upload-label span { color: var(--brand); font-weight: 600; }
-    .preview-img { width: 100%; border-radius: var(--radius-sm); display: none; margin-top: 12px; max-height: 320px; object-fit: contain; }
-    .remove-photo { margin-top: 8px; background: none; border: none; color: var(--danger); font-size: 13px; cursor: pointer; padding: 4px; }
-
-    .submit-area { padding: 0 16px 32px; }
-    .submit-area .btn-primary { font-size: 16px; padding: 15px; border-radius: var(--radius); }
-    .form-error { background: var(--danger-light); color: var(--danger); border: 1px solid #f5c6c2; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-bottom: 10px; display: none; }
+    #screen-form{background:var(--bg);}
+    .form-body{padding:16px;flex:1;}
+    .form-card{background:var(--surface);border-radius:var(--radius);padding:20px 16px;margin-bottom:12px;border:1px solid var(--border);}
+    .section-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--brand);margin-bottom:14px;}
+    textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;color:var(--text);background:#fff;resize:none;outline:none;font-family:inherit;-webkit-appearance:none;}
+    textarea:focus{border-color:var(--brand);}
+    .char-count{font-size:12px;color:var(--text-muted);text-align:right;margin-top:4px;}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .chip{padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--text-muted);display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;}
+    .chip.selected{background:var(--brand-light);border-color:var(--brand);color:var(--brand);font-weight:600;}
+    .chip-dot{width:8px;height:8px;border-radius:50%;}
+    .dot-electrical{background:#f59e0b}.dot-water{background:#3b82f6}.dot-horticulture{background:#22c55e}.dot-roads{background:#8b5cf6}.dot-sewage{background:#78716c}.dot-others{background:#ec4899}
+    .geo-row{display:flex;gap:8px;}
+    .geo-row input{flex:1;}
+    .geo-btn{padding:12px 14px;background:var(--brand-light);border:1.5px solid var(--brand);border-radius:var(--radius-sm);color:var(--brand);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    .geo-status{font-size:12px;margin-top:6px;}
+    .geo-status.ok{color:var(--success)}.geo-status.err{color:var(--danger)}
+    .date-display{padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:15px;color:var(--text-muted);border:1.5px solid var(--border);}
+    .upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:24px 16px;text-align:center;cursor:pointer;background:#fff;}
+    .upload-zone:hover{border-color:var(--brand);background:var(--brand-light);}
+    .upload-zone input{display:none;}
+    .upload-icon{font-size:32px;margin-bottom:8px;}
+    .upload-label{font-size:14px;color:var(--text-muted);}
+    .upload-label span{color:var(--brand);font-weight:600;}
+    .preview-img{width:100%;border-radius:var(--radius-sm);display:none;margin-top:12px;max-height:320px;object-fit:contain;}
+    .remove-photo{margin-top:8px;background:none;border:none;color:var(--danger);font-size:13px;cursor:pointer;padding:4px;}
+    .submit-area{padding:0 16px 32px;}
+    .submit-area .btn-primary{font-size:16px;padding:15px;border-radius:var(--radius);}
+    .form-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:10px;display:none;}
 
     /* LOADER */
-    .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 100; }
-    .loader-overlay.show { display: flex; }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 14px; color: var(--text-muted); }
+    .loader-overlay{position:fixed;inset:0;background:rgba(255,255,255,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:100;}
+    .loader-overlay.show{display:flex;}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loader-text{font-size:14px;color:var(--text-muted);}
 
     /* SUCCESS */
-    #screen-success { background: var(--bg); justify-content: center; align-items: center; padding: 32px 24px; }
-    .success-card { background: #fff; border-radius: 20px; padding: 40px 28px; text-align: center; max-width: 360px; width: 100%; border: 1px solid var(--border); }
-    .success-icon { width: 72px; height: 72px; background: var(--success-light); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
-    .success-icon svg { width: 36px; height: 36px; stroke: var(--success); fill: none; stroke-width: 2.5; }
-    .success-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-    .success-detail { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
-    .ref-badge { background: var(--brand-light); color: var(--brand); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 28px; }
+    #screen-success{background:var(--bg);justify-content:center;align-items:center;padding:32px 24px;}
+    .success-card{background:#fff;border-radius:20px;padding:40px 28px;text-align:center;max-width:360px;width:100%;border:1px solid var(--border);}
+    .success-icon{width:72px;height:72px;background:var(--success-light);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;}
+    .success-icon svg{width:36px;height:36px;stroke:var(--success);fill:none;stroke-width:2.5;}
+    .success-title{font-size:22px;font-weight:700;margin-bottom:10px;}
+    .success-detail{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:28px;}
+    .ref-badge{background:var(--brand-light);color:var(--brand);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;display:inline-block;margin-bottom:28px;}
   </style>
 </head>
 <body>
@@ -111,10 +99,10 @@
   <div class="loader-text" id="loader-text">Please wait…</div>
 </div>
 
-<!-- Hidden iframe receives form POST response — prevents page navigation -->
-<iframe name="hidden-target" id="hidden-target" style="display:none"></iframe>
+<!-- Hidden iframe — receives Google Form response, prevents page navigation -->
+<iframe name="hidden-target" style="display:none"></iframe>
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="login-card">
     <div class="login-emblem">
@@ -125,7 +113,7 @@
     <label for="phone-input">Registered mobile number</label>
     <div class="phone-row">
       <div class="phone-prefix">+91</div>
-      <input type="tel" id="phone-input" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric" />
+      <input type="tel" id="phone-input" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric"/>
     </div>
     <div class="hint">Enter the 10-digit number registered with your RWA.</div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Verify &amp; Continue →</button>
@@ -133,31 +121,26 @@
   </div>
 </div>
 
-<!-- ══ FORM ══ -->
+<!-- FORM -->
 <div class="screen" id="screen-form">
   <div class="topbar">
     <div class="topbar-brand">
       <div class="topbar-logo">S40</div>
-      <div>
-        <div class="topbar-title">Incident Report</div>
-        <div class="topbar-sub">Sector 40 RWA</div>
-      </div>
+      <div><div class="topbar-title">Incident Report</div><div class="topbar-sub">Sector 40 RWA</div></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;opacity:0.85" id="topbar-user"></span>
+      <span style="font-size:13px;opacity:.85" id="topbar-user"></span>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
   </div>
 
   <div class="form-body">
-    <!-- What happened -->
     <div class="form-card">
       <div class="section-label">What happened?</div>
-      <textarea id="f-description" rows="3" maxlength="300" placeholder="e.g. Street light on the corner of main road non-functional for 3 days…" oninput="updateCharCount()"></textarea>
+      <textarea id="f-description" rows="3" maxlength="300" placeholder="e.g. Street light at C-112 corner non-functional for 3 days…" oninput="document.getElementById('char-count').textContent=this.value.length"></textarea>
       <div class="char-count"><span id="char-count">0</span>/300</div>
     </div>
 
-    <!-- Category -->
     <div class="form-card">
       <div class="section-label">Responsibility area</div>
       <div class="chips">
@@ -170,31 +153,28 @@
       </div>
     </div>
 
-    <!-- Location -->
     <div class="form-card">
       <div class="section-label">Location</div>
       <div class="geo-row">
-        <input type="text" id="f-geo" placeholder="Tap 'Locate me' or type address e.g. Near C-112" />
-        <button class="geo-btn" onclick="getLocation()" id="geo-btn">📍 Locate me</button>
+        <input type="text" id="f-geo" placeholder="Tap Locate me or type e.g. Near C-112"/>
+        <button class="geo-btn" id="geo-btn" onclick="getLocation()">📍 Locate me</button>
       </div>
       <div class="geo-status" id="geo-status"></div>
     </div>
 
-    <!-- Date -->
     <div class="form-card">
       <div class="section-label">Log date</div>
       <div class="date-display" id="f-date"></div>
     </div>
 
-    <!-- Photo -->
     <div class="form-card">
       <div class="section-label">Photo (optional)</div>
       <div class="upload-zone" onclick="document.getElementById('photo-input').click()">
         <div class="upload-icon">📷</div>
         <div class="upload-label"><span>Tap to upload</span> or take a photo</div>
-        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)" />
+        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)"/>
       </div>
-      <img id="preview-img" class="preview-img" alt="Preview" />
+      <img id="preview-img" class="preview-img" alt="Preview"/>
       <button id="remove-photo" class="remove-photo" style="display:none" onclick="removePhoto()">✕ Remove photo</button>
     </div>
   </div>
@@ -205,12 +185,10 @@
   </div>
 </div>
 
-<!-- ══ SUCCESS ══ -->
+<!-- SUCCESS -->
 <div class="screen" id="screen-success">
   <div class="success-card">
-    <div class="success-icon">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
+    <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div class="success-title">Report submitted!</div>
     <div class="success-detail">Your incident has been logged. The relevant team will be notified.</div>
     <div class="ref-badge" id="ref-badge"></div>
@@ -220,23 +198,27 @@
 </div>
 
 <script>
-  /* ── CONFIGURATION ── paste your Apps Script URL here ── */
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec';
-  /* ───────────────────────────────────────────────────── */
+  /* ── CONFIGURATION ── */
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAWq8OxMKZyPWKSAiE76ID6RrE8fL943iNck5VCm1cQ51e6r26Y8VJZ-dnxVmZC9FW/exec'; // for login auth only
+  const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSf8yrZf6IrJtI9rQ8tW6PRCSMuwzbrZ8zZmp1JyUHNvozoi_w/formResponse';
+  const ENTRY = {
+    refId:       'entry.1333853772',
+    logDate:     'entry.158441778',
+    name:        'entry.847639464',
+    phone:       'entry.419169709',
+    category:    'entry.502866980',
+    description: 'entry.2023020809',
+    geo:         'entry.1936879431',
+    lat:         'entry.82740247',
+    lng:         'entry.1066923439',
+    photo:       'entry.1010889013'
+  };
+  /* ────────────────── */
 
-  let currentUser = null;
-  let selectedCategory = null;
-  let photoBase64 = null;
-  let geoCoords = null;
+  let currentUser = null, selectedCategory = null, photoBase64 = null, geoCoords = null;
 
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-  function showLoader(msg) {
-    document.getElementById('loader-text').textContent = msg || 'Please wait…';
-    document.getElementById('loader').classList.add('show');
-  }
+  function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+  function showLoader(m) { document.getElementById('loader-text').textContent=m||'Please wait…'; document.getElementById('loader').classList.add('show'); }
   function hideLoader() { document.getElementById('loader').classList.remove('show'); }
 
   window.onload = () => {
@@ -247,20 +229,20 @@
 
   function setDateDisplay() {
     document.getElementById('f-date').textContent =
-      new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+      new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   }
 
   /* ── LOGIN via JSONP ── */
   function jsonpCall(params) {
     return new Promise((resolve, reject) => {
       const cb = 'cb_' + Date.now();
-      const timer = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
-      function cleanup() { delete window[cb]; document.getElementById(cb) && document.getElementById(cb).remove(); }
-      window[cb] = (data) => { clearTimeout(timer); cleanup(); resolve(data); };
-      const qs = Object.entries({ ...params, callback: cb })
-        .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
+      const timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); }, 15000);
+      function cleanup(){ delete window[cb]; const s=document.getElementById(cb); if(s) s.remove(); }
+      window[cb] = data => { clearTimeout(timer); cleanup(); resolve(data); };
+      const qs = Object.entries({...params, callback:cb}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
       const s = document.createElement('script');
-      s.id = cb; s.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('Network error')); };
+      s.id = cb;
+      s.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('Network error')); };
       s.src = APPS_SCRIPT_URL + '?' + qs;
       document.head.appendChild(s);
     });
@@ -268,9 +250,7 @@
 
   async function doLogin() {
     const raw = document.getElementById('phone-input').value.trim();
-    if (!/^\d{10}$/.test(raw)) {
-      showLoginError('Please enter a valid 10-digit mobile number.'); return;
-    }
+    if (!/^\d{10}$/.test(raw)) { showLoginError('Please enter a valid 10-digit mobile number.'); return; }
     const phone = '+91' + raw;
 
     if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
@@ -282,7 +262,7 @@
     showLoader('Verifying…');
     document.getElementById('login-btn').disabled = true;
     try {
-      const data = await jsonpCall({ action: 'auth', phone });
+      const data = await jsonpCall({ action:'auth', phone });
       if (data.success) {
         currentUser = { phone, name: data.name };
         sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
@@ -298,123 +278,103 @@
     }
   }
 
-  function showLoginError(msg) {
-    const el = document.getElementById('login-error');
-    el.textContent = msg; el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 6000);
-  }
+  function showLoginError(msg) { const el=document.getElementById('login-error'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',6000); }
 
   function enterFormScreen() {
     document.getElementById('topbar-user').textContent = currentUser.name;
-    setDateDisplay();
-    showScreen('screen-form');
+    setDateDisplay(); showScreen('screen-form');
   }
 
   function doLogout() {
     sessionStorage.removeItem('s40_user');
-    currentUser = null; selectedCategory = null; photoBase64 = null; geoCoords = null;
-    document.getElementById('phone-input').value = '';
-    document.getElementById('f-description').value = '';
-    document.getElementById('f-geo').value = '';
-    document.getElementById('char-count').textContent = '0';
-    document.getElementById('geo-status').textContent = '';
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-    removePhoto();
-    showScreen('screen-login');
+    currentUser=null; selectedCategory=null; photoBase64=null; geoCoords=null;
+    document.getElementById('phone-input').value='';
+    document.getElementById('f-description').value='';
+    document.getElementById('f-geo').value='';
+    document.getElementById('char-count').textContent='0';
+    document.getElementById('geo-status').textContent='';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    removePhoto(); showScreen('screen-login');
   }
 
-  /* ── FORM HELPERS ── */
-  function selectChip(el) {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedCategory = el.getAttribute('data-val');
-  }
-  function updateCharCount() {
-    document.getElementById('char-count').textContent = document.getElementById('f-description').value.length;
-  }
+  function selectChip(el) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedCategory=el.getAttribute('data-val'); }
+
   function getLocation() {
-    const btn = document.getElementById('geo-btn');
-    const status = document.getElementById('geo-status');
-    if (!navigator.geolocation) { status.textContent = 'Not supported on this device.'; status.className = 'geo-status err'; return; }
-    btn.textContent = '⏳ Locating…'; btn.disabled = true;
+    const btn=document.getElementById('geo-btn'), status=document.getElementById('geo-status');
+    if (!navigator.geolocation) { status.textContent='Not supported.'; status.className='geo-status err'; return; }
+    btn.textContent='⏳ Locating…'; btn.disabled=true;
     navigator.geolocation.getCurrentPosition(
       pos => {
-        geoCoords = pos.coords;
-        document.getElementById('f-geo').value = pos.coords.latitude.toFixed(6) + ', ' + pos.coords.longitude.toFixed(6);
-        status.textContent = '✓ Location captured (±' + Math.round(pos.coords.accuracy) + 'm)';
-        status.className = 'geo-status ok';
-        btn.textContent = '📍 Re-locate'; btn.disabled = false;
+        geoCoords=pos.coords;
+        document.getElementById('f-geo').value=pos.coords.latitude.toFixed(6)+', '+pos.coords.longitude.toFixed(6);
+        status.textContent='✓ Location captured (±'+Math.round(pos.coords.accuracy)+'m)';
+        status.className='geo-status ok'; btn.textContent='📍 Re-locate'; btn.disabled=false;
       },
-      () => { status.textContent = 'Could not get location. Enter manually.'; status.className = 'geo-status err'; btn.textContent = '📍 Locate me'; btn.disabled = false; },
-      { enableHighAccuracy: true, timeout: 12000 }
+      () => { status.textContent='Could not get location. Enter manually.'; status.className='geo-status err'; btn.textContent='📍 Locate me'; btn.disabled=false; },
+      {enableHighAccuracy:true,timeout:12000}
     );
   }
+
   function handlePhoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('preview-img').src = e.target.result;
-      document.getElementById('preview-img').style.display = 'block';
-      document.getElementById('remove-photo').style.display = 'inline-block';
-      // Compress: max 800px, 50% quality
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scale = img.width > 800 ? 800 / img.width : 1;
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+    const file=input.files[0]; if (!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      document.getElementById('preview-img').src=e.target.result;
+      document.getElementById('preview-img').style.display='block';
+      document.getElementById('remove-photo').style.display='inline-block';
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        const scale=img.width>800?800/img.width:1;
+        canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale);
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        photoBase64=canvas.toDataURL('image/jpeg',0.5);
       };
-      img.src = e.target.result;
+      img.src=e.target.result;
     };
     reader.readAsDataURL(file);
   }
+
   function removePhoto() {
-    photoBase64 = null;
-    document.getElementById('photo-input').value = '';
-    document.getElementById('preview-img').style.display = 'none';
-    document.getElementById('preview-img').src = '';
-    document.getElementById('remove-photo').style.display = 'none';
+    photoBase64=null; document.getElementById('photo-input').value='';
+    document.getElementById('preview-img').style.display='none';
+    document.getElementById('preview-img').src='';
+    document.getElementById('remove-photo').style.display='none';
   }
 
-  /* ── SUBMIT via hidden iframe form POST ── */
+  /* ── SUBMIT to Google Form via hidden iframe ── */
   function submitForm() {
     const desc = document.getElementById('f-description').value.trim();
     const geo  = document.getElementById('f-geo').value.trim();
-
     if (!desc) { showFormError('Please describe the issue.'); return; }
     if (!selectedCategory) { showFormError('Please select a responsibility area.'); return; }
-    if (!geo) { showFormError('Please capture or enter a location.'); return; }
+    if (!geo)  { showFormError('Please capture or enter a location.'); return; }
 
-    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-      const refId = makeRefId();
-      document.getElementById('ref-badge').textContent = 'Ref: ' + refId + ' (demo)';
-      showScreen('screen-success'); return;
-    }
-
-    const refId = makeRefId();
+    const refId   = makeRefId();
     const logDate = new Date().toLocaleString('en-IN');
 
-    // Build a hidden form and submit it to the iframe
+    // Build hidden form targeting the invisible iframe
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = APPS_SCRIPT_URL;
-    form.target = 'hidden-target'; // posts into hidden iframe, no page navigation
+    form.action = FORM_ACTION;
+    form.target = 'hidden-target';
 
-    const fields = {
-      action: 'logIncident',
-      refId, phone: currentUser.phone, name: currentUser.name,
-      description: desc, category: selectedCategory,
-      geo, lat: geoCoords ? String(geoCoords.latitude) : '',
-      lng: geoCoords ? String(geoCoords.longitude) : '',
-      logDate, photo: photoBase64 || ''
+    const data = {
+      [ENTRY.refId]:       refId,
+      [ENTRY.logDate]:     logDate,
+      [ENTRY.name]:        currentUser.name,
+      [ENTRY.phone]:       currentUser.phone,
+      [ENTRY.category]:    selectedCategory,
+      [ENTRY.description]: desc,
+      [ENTRY.geo]:         geo,
+      [ENTRY.lat]:         geoCoords ? String(geoCoords.latitude)  : '',
+      [ENTRY.lng]:         geoCoords ? String(geoCoords.longitude) : '',
+      [ENTRY.photo]:       photoBase64 ? '[photo attached — ' + Math.round(photoBase64.length/1024) + 'KB]' : ''
     };
 
-    Object.entries(fields).forEach(([k, v]) => {
-      const inp = document.createElement('input');
-      inp.type = 'hidden'; inp.name = k; inp.value = v;
+    Object.entries(data).forEach(([k,v])=>{
+      const inp=document.createElement('input');
+      inp.type='hidden'; inp.name=k; inp.value=v;
       form.appendChild(inp);
     });
 
@@ -422,39 +382,29 @@
     form.submit();
     document.body.removeChild(form);
 
-    // Show success — Apps Script will receive the POST reliably
-    setTimeout(() => {
-      document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
-      showScreen('screen-success');
-    }, 1500);
+    // Show success immediately — Google Forms receives POST reliably
+    document.getElementById('ref-badge').textContent = 'Ref: ' + refId;
+    showScreen('screen-success');
   }
 
   function makeRefId() {
-    const n = new Date();
-    return 'S40-' + n.getFullYear() +
-      String(n.getMonth()+1).padStart(2,'0') + String(n.getDate()).padStart(2,'0') + '-' +
-      String(n.getHours()).padStart(2,'0') + String(n.getMinutes()).padStart(2,'0') + String(n.getSeconds()).padStart(2,'0');
+    const n=new Date();
+    return 'S40-'+n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+String(n.getHours()).padStart(2,'0')+String(n.getMinutes()).padStart(2,'0')+String(n.getSeconds()).padStart(2,'0');
   }
-
-  function showFormError(msg) {
-    const el = document.getElementById('form-error');
-    el.textContent = msg; el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 5000);
-  }
+  function showFormError(msg) { const el=document.getElementById('form-error'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',5000); }
 
   function reportAnother() {
-    selectedCategory = null; photoBase64 = null; geoCoords = null;
-    document.getElementById('f-description').value = '';
-    document.getElementById('f-geo').value = '';
-    document.getElementById('char-count').textContent = '0';
-    document.getElementById('geo-status').textContent = '';
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-    removePhoto(); setDateDisplay();
-    showScreen('screen-form');
+    selectedCategory=null; photoBase64=null; geoCoords=null;
+    document.getElementById('f-description').value='';
+    document.getElementById('f-geo').value='';
+    document.getElementById('char-count').textContent='0';
+    document.getElementById('geo-status').textContent='';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    removePhoto(); setDateDisplay(); showScreen('screen-form');
   }
 
-  document.getElementById('phone-input').addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
-  document.getElementById('phone-input').addEventListener('keyup', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('phone-input').addEventListener('keypress',e=>{ if(!/[0-9]/.test(e.key)) e.preventDefault(); });
+  document.getElementById('phone-input').addEventListener('keyup',e=>{ if(e.key==='Enter') doLogin(); });
 </script>
 </body>
 </html>
