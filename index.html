@@ -128,7 +128,12 @@
     .issue-ref{font-size:11px;color:var(--text-muted);}
     .issue-desc{padding:0 16px 10px;font-size:14px;line-height:1.5;color:var(--text);}
     .issue-photo{width:100%;max-height:220px;object-fit:cover;display:block;cursor:pointer;}
-    .issue-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+    .issue-body-row{display:flex;align-items:flex-start;gap:12px;padding:0 16px 0;}
+    .issue-body-left{flex:1;min-width:0;}
+    .issue-body-right{flex-shrink:0;width:90px;}
+    .issue-thumb{width:90px;height:90px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-top:2px;}
+    .issue-desc{font-size:14px;line-height:1.5;color:var(--text);padding-bottom:6px;}
+    .issue-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;}
     .issue-info{font-size:12px;color:var(--text-muted);line-height:1.6;}
     .close-btn{background:var(--success-light);border:1px solid var(--success);color:var(--success);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
     .close-btn:active{background:var(--success);color:#fff;}
@@ -482,14 +487,18 @@
             <div class="issue-ref" style="margin-top:5px">${issue.refId} · ${issue.logDate}</div>
           </div>
         </div>
-        <div class="issue-desc">${escHtml(issue.description)}</div>
-        ${issue.photo?`<img class="issue-photo" src="${issue.photo}" alt="Incident photo" onclick="openLightbox('${issue.photo}')"/>`:'' }
-        <div class="issue-footer">
-          <div class="issue-info">
-            📍 ${escHtml(issue.geo)}<br>
-            👤 ${escHtml(issue.name)}
+        <div class="issue-body-row">
+          <div class="issue-body-left">
+            <div class="issue-desc">${escHtml(issue.description)}</div>
+            <div class="issue-info" style="padding:0 0 10px">
+              📍 ${escHtml(issue.geo)}<br>
+              👤 ${escHtml(issue.name)}
+            </div>
           </div>
-          ${issue.phone===currentUser.phone?`<button class="close-btn" onclick="closeIssue('${issue.refId}',this)">✓ Mark Closed</button>`:''}
+          ${issue.photo?`<div class="issue-body-right"><img class="issue-thumb" src="${issue.photo}" alt="Photo" onclick="openLightbox('${issue.photo}')"/></div>`:''}
+        </div>
+        <div class="issue-footer">
+          ${issue.phone===currentUser.phone?`<button class="close-btn" onclick="closeIssue('${issue.refId}',this)">✓ Mark Closed</button>`:'<div></div>'}
         </div>
       </div>
     `).join('');
