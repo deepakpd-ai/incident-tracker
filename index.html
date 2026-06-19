@@ -338,7 +338,7 @@
     const phone='+91'+raw;
 
     if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
-      currentUser={phone,name:'Demo User'};
+      currentUser={phone,name:'Demo User',isAdmin:false};
       sessionStorage.setItem('s40_user',JSON.stringify(currentUser));
       enterApp();return;
     }
@@ -347,7 +347,7 @@
     try{
       const data=await jsonpCall({action:'auth',phone});
       if(data.success){
-        currentUser={phone,name:data.name};
+        currentUser={phone,name:data.name,isAdmin:!!data.isAdmin};
         sessionStorage.setItem('s40_user',JSON.stringify(currentUser));
         enterApp();
       }else{showLoginError('Number not registered. Contact your RWA admin.');}
@@ -355,7 +355,10 @@
     finally{hideLoader();document.getElementById('login-btn').disabled=false;}
   }
   function showLoginError(msg){const el=document.getElementById('login-error');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',6000);}
-  function enterApp(){document.getElementById('topbar-user').textContent=currentUser.name;setDateDisplay();showScreen('screen-app');}
+  function enterApp(){
+  document.getElementById('topbar-user').textContent=currentUser.name+(currentUser.isAdmin?' · Admin':'');
+  setDateDisplay();showScreen('screen-app');
+}
   function doLogout(){
     sessionStorage.removeItem('s40_user');currentUser=null;selectedCategory=null;photoUrl=null;geoCoords=null;
     document.getElementById('phone-input').value='';document.getElementById('f-description').value='';
@@ -496,7 +499,7 @@
           ${issue.photo?`<div class="issue-body-right"><img class="issue-thumb" src="${issue.photo}" alt="Photo" onclick="openLightbox('${issue.photo}')"/></div>`:''}
         </div>
         <div class="issue-footer">
-          ${issue.phone===currentUser.phone?`<button class="close-btn" onclick="closeIssue('${issue.refId}',this)">✓ Mark Closed</button>`:'<div></div>'}
+          ${(issue.phone===currentUser.phone||currentUser.isAdmin)?`<button class="close-btn" onclick="closeIssue('${issue.refId}',this)">✓ Mark Closed${currentUser.isAdmin&&issue.phone!==currentUser.phone?' (Admin)':''}</button>`:'<div></div>'}
         </div>
       </div>
     `).join('');
