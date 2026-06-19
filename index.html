@@ -360,12 +360,9 @@
   setDateDisplay();showScreen('screen-app');
 }
   function doLogout(){
-    sessionStorage.removeItem('s40_user');currentUser=null;selectedCategory=null;photoUrl=null;geoCoords=null;
-    document.getElementById('phone-input').value='';document.getElementById('f-description').value='';
-    document.getElementById('f-geo').value='';document.getElementById('char-count').textContent='0';
-    document.getElementById('geo-status').textContent='';
-    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-    removePhoto();showScreen('screen-login');
+    sessionStorage.removeItem('s40_user');
+    // Force a full reload to guarantee no stale JS state (e.g. admin flags) survives across users
+    window.location.reload();
   }
 
   /* ── FORM HELPERS ── */
