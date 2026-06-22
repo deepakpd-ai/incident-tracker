@@ -52,6 +52,10 @@
     .btn-primary:disabled{opacity:.55;cursor:not-allowed;}
     .btn-secondary{width:100%;padding:12px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;}
     .msg-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-top:12px;display:none;}
+    .msg-success{background:var(--success-light);color:var(--success);border:1px solid #b2dfc3;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-top:12px;display:none;}
+    .register-link{text-align:center;font-size:13px;color:var(--text-muted);margin-top:16px;cursor:pointer;}
+    .register-link span{color:var(--brand);font-weight:600;}
+    #screen-register,#screen-otp{background:var(--brand);justify-content:center;align-items:center;padding:32px 24px;}
 
     /* FORM TAB */
     .tab-body{padding:16px;flex:1;overflow-y:auto;}
@@ -178,6 +182,55 @@
     <div class="hint">Enter the 10-digit number registered with your RWA.</div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Verify &amp; Continue →</button>
     <div class="msg-error" id="login-error"></div>
+    <div class="register-link" onclick="goToRegisterStep1()">New here? <span>Register</span></div>
+  </div>
+</div>
+
+<!-- ══ REGISTER — STEP 1: DETAILS ══ -->
+<div class="screen" id="screen-register">
+  <div class="login-card">
+    <div class="login-emblem">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="login-heading">New Registration</div>
+    <div class="login-sub">Join Sector 40's incident reporting community</div>
+
+    <label for="reg-name">Full name</label>
+    <input type="text" id="reg-name" placeholder="e.g. Priya Sharma" style="margin-bottom:16px"/>
+
+    <label for="reg-phone">Mobile number</label>
+    <div class="phone-row">
+      <div class="phone-prefix">+91</div>
+      <input type="tel" id="reg-phone" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric"/>
+    </div>
+
+    <label for="reg-email" style="margin-top:8px">Email address</label>
+    <input type="text" id="reg-email" placeholder="you@example.com" style="margin-bottom:8px"/>
+    <div class="hint">We'll send a 6-digit verification code to this email.</div>
+
+    <button class="btn-primary" id="reg-step1-btn" onclick="requestOtp()">Send Verification Code →</button>
+    <div class="msg-error" id="register-error"></div>
+    <div class="register-link" onclick="backToLogin()">Already registered? <span>Log in</span></div>
+  </div>
+</div>
+
+<!-- ══ REGISTER — STEP 2: OTP ══ -->
+<div class="screen" id="screen-otp">
+  <div class="login-card">
+    <div class="login-emblem">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="login-heading">Enter Verification Code</div>
+    <div class="login-sub" id="otp-sub">We've sent a 6-digit code to your email.</div>
+
+    <label for="otp-input">6-digit code</label>
+    <input type="text" id="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align:center;font-size:22px;letter-spacing:6px;font-weight:700;margin-bottom:8px"/>
+    <div class="hint">Code expires in 10 minutes.</div>
+
+    <button class="btn-primary" id="otp-verify-btn" onclick="verifyOtp()">Verify &amp; Create Account</button>
+    <div class="msg-error" id="otp-error"></div>
+    <div class="register-link" onclick="resendOtp()">Didn't get it? <span>Resend code</span></div>
+    <div class="register-link" onclick="goToRegisterStep1()">← Back to edit details</div>
   </div>
 </div>
 
@@ -365,6 +418,96 @@
     window.location.reload();
   }
 
+  /* ── REGISTRATION ── */
+  let regPendingPhone = null, regPendingName = null;
+
+  function goToRegisterStep1(){
+    document.getElementById('register-error').style.display='none';
+    showScreen('screen-register');
+  }
+  function backToLogin(){ showScreen('screen-login'); }
+
+  async function requestOtp(){
+    const name  = document.getElementById('reg-name').value.trim();
+    const raw   = document.getElementById('reg-phone').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+
+    if(!name){ showRegError('Please enter your name.'); return; }
+    if(!/^\d{10}$/.test(raw)){ showRegError('Please enter a valid 10-digit mobile number.'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showRegError('Please enter a valid email address.'); return; }
+
+    const phone = '+91' + raw;
+
+    if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+      regPendingPhone = phone; regPendingName = name;
+      document.getElementById('otp-sub').textContent = 'Demo mode — enter any 6 digits to continue.';
+      showScreen('screen-otp');
+      return;
+    }
+
+    showLoader('Sending verification code…');
+    document.getElementById('reg-step1-btn').disabled = true;
+    try{
+      const data = await jsonpCall({ action:'requestOtp', name, phone, email });
+      if(data.success){
+        regPendingPhone = phone; regPendingName = name;
+        document.getElementById('otp-sub').textContent = data.message || ('We sent a code to ' + email);
+        document.getElementById('otp-input').value = '';
+        showScreen('screen-otp');
+      } else {
+        showRegError(data.error || 'Could not send code. Please try again.');
+      }
+    }catch(e){ showRegError('Could not connect. Please try again.'); }
+    finally{ hideLoader(); document.getElementById('reg-step1-btn').disabled = false; }
+  }
+
+  async function resendOtp(){
+    if(!regPendingPhone){ goToRegisterStep1(); return; }
+    const email = document.getElementById('reg-email').value.trim();
+    const name  = regPendingName;
+    showLoader('Resending code…');
+    try{
+      const data = await jsonpCall({ action:'requestOtp', name, phone: regPendingPhone, email });
+      if(data.success){ showOtpError('A new code has been sent.', true); }
+      else { showOtpError(data.error || 'Could not resend code.'); }
+    }catch(e){ showOtpError('Could not connect. Please try again.'); }
+    finally{ hideLoader(); }
+  }
+
+  async function verifyOtp(){
+    const otp = document.getElementById('otp-input').value.trim();
+    if(!/^\d{6}$/.test(otp)){ showOtpError('Please enter the 6-digit code.'); return; }
+
+    if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+      currentUser = { phone: regPendingPhone, name: regPendingName, isAdmin:false };
+      sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
+      enterApp(); return;
+    }
+
+    showLoader('Verifying…');
+    document.getElementById('otp-verify-btn').disabled = true;
+    try{
+      const data = await jsonpCall({ action:'verifyOtp', phone: regPendingPhone, otp });
+      if(data.success){
+        currentUser = { phone: regPendingPhone, name: data.name, isAdmin:false };
+        sessionStorage.setItem('s40_user', JSON.stringify(currentUser));
+        enterApp();
+      } else {
+        showOtpError(data.error || 'Verification failed. Please try again.');
+      }
+    }catch(e){ showOtpError('Could not connect. Please try again.'); }
+    finally{ hideLoader(); document.getElementById('otp-verify-btn').disabled = false; }
+  }
+
+  function showRegError(msg){ const el=document.getElementById('register-error'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',6000); }
+  function showOtpError(msg, isSuccess){
+    const el=document.getElementById('otp-error');
+    el.textContent=msg;
+    el.className = isSuccess ? 'msg-success' : 'msg-error';
+    el.style.display='block';
+    setTimeout(()=>el.style.display='none',6000);
+  }
+
   /* ── FORM HELPERS ── */
   function selectChip(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedCategory=el.getAttribute('data-val');}
 
@@ -545,6 +688,9 @@
 
   document.getElementById('phone-input').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
   document.getElementById('phone-input').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('reg-phone').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
+  document.getElementById('otp-input').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
+  document.getElementById('otp-input').addEventListener('keyup',e=>{if(e.key==='Enter')verifyOtp();});
 </script>
 </body>
 </html>
