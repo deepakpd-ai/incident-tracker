@@ -179,7 +179,9 @@
       <div class="phone-prefix">+91</div>
       <input type="tel" id="phone-input" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric"/>
     </div>
-    <div class="hint">Enter the 10-digit number registered with your RWA.</div>
+    <label for="pin-input" style="margin-top:14px">5-digit PIN</label>
+    <input type="password" id="pin-input" placeholder="•••••" maxlength="5" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700"/>
+    <div class="hint">Enter the PIN you created during registration.</div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Verify &amp; Continue →</button>
     <div class="msg-error" id="login-error"></div>
     <div class="register-link" onclick="goToRegisterStep1()">New here? <span>Register</span></div>
@@ -207,6 +209,13 @@
     <label for="reg-email" style="margin-top:8px">Email address</label>
     <input type="text" id="reg-email" placeholder="you@example.com" style="margin-bottom:8px"/>
     <div class="hint">We'll send a 6-digit verification code to this email.</div>
+
+    <label for="reg-block" style="margin-top:8px">Block / House number</label>
+    <input type="text" id="reg-block" placeholder="e.g. C-112" style="margin-bottom:16px"/>
+
+    <label for="reg-pin">Create a 5-digit PIN</label>
+    <input type="password" id="reg-pin" placeholder="•••••" maxlength="5" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700;margin-bottom:4px"/>
+    <div class="hint">You'll use this PIN with your phone number to log in. Choose something only you know.</div>
 
     <button class="btn-primary" id="reg-step1-btn" onclick="requestOtp()">Send Verification Code →</button>
     <div class="msg-error" id="register-error"></div>
@@ -387,7 +396,9 @@
   /* ── LOGIN ── */
   async function doLogin(){
     const raw=document.getElementById('phone-input').value.trim();
+    const pin=document.getElementById('pin-input').value.trim();
     if(!/^\d{10}$/.test(raw)){showLoginError('Please enter a valid 10-digit mobile number.');return;}
+    if(!/^\d{5}$/.test(pin)){showLoginError('Please enter your 5-digit PIN.');return;}
     const phone='+91'+raw;
 
     if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
@@ -398,12 +409,16 @@
     showLoader('Verifying…');
     document.getElementById('login-btn').disabled=true;
     try{
-      const data=await jsonpCall({action:'auth',phone});
+      const data=await jsonpCall({action:'auth',phone,pin});
       if(data.success){
         currentUser={phone,name:data.name,isAdmin:!!data.isAdmin};
         sessionStorage.setItem('s40_user',JSON.stringify(currentUser));
+        document.getElementById('pin-input').value='';
         enterApp();
-      }else{showLoginError('Number not registered. Contact your RWA admin.');}
+      }else{
+        showLoginError(data.error || 'Login failed. Please try again.');
+        document.getElementById('pin-input').value='';
+      }
     }catch(e){showLoginError('Could not connect. Please try again.');}
     finally{hideLoader();document.getElementById('login-btn').disabled=false;}
   }
@@ -431,10 +446,14 @@
     const name  = document.getElementById('reg-name').value.trim();
     const raw   = document.getElementById('reg-phone').value.trim();
     const email = document.getElementById('reg-email').value.trim();
+    const block = document.getElementById('reg-block').value.trim();
+    const pin   = document.getElementById('reg-pin').value.trim();
 
     if(!name){ showRegError('Please enter your name.'); return; }
     if(!/^\d{10}$/.test(raw)){ showRegError('Please enter a valid 10-digit mobile number.'); return; }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showRegError('Please enter a valid email address.'); return; }
+    if(!block){ showRegError('Please enter your block/house number.'); return; }
+    if(!/^\d{5}$/.test(pin)){ showRegError('PIN must be exactly 5 digits.'); return; }
 
     const phone = '+91' + raw;
 
@@ -448,7 +467,7 @@
     showLoader('Sending verification code…');
     document.getElementById('reg-step1-btn').disabled = true;
     try{
-      const data = await jsonpCall({ action:'requestOtp', name, phone, email });
+      const data = await jsonpCall({ action:'requestOtp', name, phone, email, blockHouseNo: block, pin });
       if(data.success){
         regPendingPhone = phone; regPendingName = name;
         document.getElementById('otp-sub').textContent = data.message || ('We sent a code to ' + email);
@@ -464,10 +483,12 @@
   async function resendOtp(){
     if(!regPendingPhone){ goToRegisterStep1(); return; }
     const email = document.getElementById('reg-email').value.trim();
+    const block = document.getElementById('reg-block').value.trim();
+    const pin   = document.getElementById('reg-pin').value.trim();
     const name  = regPendingName;
     showLoader('Resending code…');
     try{
-      const data = await jsonpCall({ action:'requestOtp', name, phone: regPendingPhone, email });
+      const data = await jsonpCall({ action:'requestOtp', name, phone: regPendingPhone, email, blockHouseNo: block, pin });
       if(data.success){ showOtpError('A new code has been sent.', true); }
       else { showOtpError(data.error || 'Could not resend code.'); }
     }catch(e){ showOtpError('Could not connect. Please try again.'); }
@@ -691,6 +712,9 @@
   document.getElementById('reg-phone').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
   document.getElementById('otp-input').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
   document.getElementById('otp-input').addEventListener('keyup',e=>{if(e.key==='Enter')verifyOtp();});
+  document.getElementById('pin-input').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
+  document.getElementById('pin-input').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('reg-pin').addEventListener('keypress',e=>{if(!/[0-9]/.test(e.key))e.preventDefault();});
 </script>
 </body>
 </html>
