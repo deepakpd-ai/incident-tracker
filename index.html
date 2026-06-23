@@ -173,14 +173,14 @@
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
     <div class="login-heading">Sector 40</div>
-    <div class="login-sub">Community Incident Reporter<br>RWA — Infrastructure Upkeep</div>
+    <div class="login-sub">Community Incident Reporter<br>Sector 40 Community — Infrastructure Upkeep</div>
     <label for="phone-input">Registered mobile number</label>
     <div class="phone-row">
       <div class="phone-prefix">+91</div>
       <input type="tel" id="phone-input" placeholder="98XXXXXXXX" maxlength="10" inputmode="numeric"/>
     </div>
-    <label for="pin-input" style="margin-top:14px">5-digit PIN</label>
-    <input type="password" id="pin-input" placeholder="•••••" maxlength="5" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700"/>
+    <label for="pin-input" style="margin-top:14px">4-digit PIN</label>
+    <input type="password" id="pin-input" placeholder="••••" maxlength="4" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700"/>
     <div class="hint">Enter the PIN you created during registration.</div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Verify &amp; Continue →</button>
     <div class="msg-error" id="login-error"></div>
@@ -213,8 +213,8 @@
     <label for="reg-block" style="margin-top:8px">Block / House number</label>
     <input type="text" id="reg-block" placeholder="e.g. C-112" style="margin-bottom:16px"/>
 
-    <label for="reg-pin">Create a 5-digit PIN</label>
-    <input type="password" id="reg-pin" placeholder="•••••" maxlength="5" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700;margin-bottom:4px"/>
+    <label for="reg-pin">Create a 4-digit PIN</label>
+    <input type="password" id="reg-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700;margin-bottom:4px"/>
     <div class="hint">You'll use this PIN with your phone number to log in. Choose something only you know.</div>
 
     <button class="btn-primary" id="reg-step1-btn" onclick="requestOtp()">Send Verification Code →</button>
@@ -248,7 +248,7 @@
   <div class="topbar">
     <div class="topbar-brand">
       <div class="topbar-logo">S40</div>
-      <div><div class="topbar-title">Sector 40 RWA</div><div class="topbar-sub">Incident Tracker</div></div>
+      <div><div class="topbar-title">Sector 40 Community</div><div class="topbar-sub">Incident Tracker</div></div>
     </div>
     <div class="topbar-actions">
       <span class="topbar-name" id="topbar-user"></span>
@@ -398,7 +398,7 @@
     const raw=document.getElementById('phone-input').value.trim();
     const pin=document.getElementById('pin-input').value.trim();
     if(!/^\d{10}$/.test(raw)){showLoginError('Please enter a valid 10-digit mobile number.');return;}
-    if(!/^\d{5}$/.test(pin)){showLoginError('Please enter your 5-digit PIN.');return;}
+    if(!/^\d{4}$/.test(pin)){showLoginError('Please enter your 4-digit PIN.');return;}
     const phone='+91'+raw;
 
     if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
@@ -453,7 +453,7 @@
     if(!/^\d{10}$/.test(raw)){ showRegError('Please enter a valid 10-digit mobile number.'); return; }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showRegError('Please enter a valid email address.'); return; }
     if(!block){ showRegError('Please enter your block/house number.'); return; }
-    if(!/^\d{5}$/.test(pin)){ showRegError('PIN must be exactly 5 digits.'); return; }
+    if(!/^\d{4}$/.test(pin)){ showRegError('PIN must be exactly 4 digits.'); return; }
 
     const phone = '+91' + raw;
 
